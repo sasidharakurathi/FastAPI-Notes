@@ -55,6 +55,22 @@
       margin-bottom: 1em;
     }
 
+    a {
+      color: var(--text);
+      transition: color 0.2s ease;
+    }
+
+    a:hover,
+    a:focus-visible,
+    a:visited:hover,
+    a:visited:focus-visible {
+      color: var(--primary);
+    }
+
+    a:visited {
+      color: var(--text);
+    }
+
     .cover-page {
       display: flex;
       flex-direction: column;
@@ -200,6 +216,64 @@
       bottom: -5px;
     }
 
+    .toc-list a:hover,
+    .toc-list a:focus-visible,
+    .toc-list a:visited:hover,
+    .toc-list a:visited:focus-visible {
+      color: var(--primary);
+    }
+
+    .toc-list a:visited {
+      color: var(--text);
+    }
+
+    .toc-link {
+      appearance: none;
+      border: 0;
+      background: white;
+      color: var(--text);
+      padding: 0 10px 0 0;
+      margin: 0;
+      font: inherit;
+      text-align: left;
+      position: relative;
+      bottom: -5px;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+
+    .toc-link:hover,
+    .toc-link:focus-visible {
+      color: var(--primary);
+    }
+
+    .link-status {
+      position: fixed;
+      left: 14px;
+      bottom: 14px;
+      z-index: 1200;
+      max-width: min(520px, calc(100vw - 28px));
+      padding: 8px 12px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #009688, #0b7d71);
+      color: #f4fffd;
+      font-size: 10pt;
+      line-height: 1.3;
+      box-shadow: 0 10px 24px rgba(0, 121, 107, 0.28);
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .link-status.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
     .toc-list .page-num {
       background: white;
       padding-left: 10px;
@@ -257,6 +331,13 @@
         position: static;
         left: auto;
         right: auto;
+      }
+
+      .link-status {
+        left: 10px;
+        right: 10px;
+        bottom: 68px;
+        max-width: none;
       }
 
       .header {

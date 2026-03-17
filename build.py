@@ -34,6 +34,7 @@ def build_handbook():
                             const prevBtn = document.getElementById('btn-prev-page');
                             const nextBtn = document.getElementById('btn-next-page');
                             const topBtn = document.getElementById('btn-top');
+                            const linkStatus = document.getElementById('link-status');
                             if (!pages.length || !prevBtn || !nextBtn || !topBtn) {
                                 return;
                             }
@@ -111,6 +112,27 @@ def build_handbook():
                                 animateTo(targetY, 560);
                             }
 
+                            function getPreviewUrl(targetSelector) {
+                                return window.location.origin + window.location.pathname + targetSelector;
+                            }
+
+                            function showLinkStatus(targetSelector) {
+                                if (!linkStatus || !targetSelector) {
+                                    return;
+                                }
+
+                                linkStatus.textContent = getPreviewUrl(targetSelector);
+                                linkStatus.classList.add('is-visible');
+                            }
+
+                            function hideLinkStatus() {
+                                if (!linkStatus) {
+                                    return;
+                                }
+
+                                linkStatus.classList.remove('is-visible');
+                            }
+
                             prevBtn.addEventListener('click', function () {
                                 updateButtonStates();
                                 scrollToPage(currentPage - 1);
@@ -126,32 +148,80 @@ def build_handbook():
                             });
 
                             if (tocContainer) {
+                                tocContainer.addEventListener('mouseover', function (event) {
+                                    const target = event.target;
+                                    if (!(target instanceof Element)) {
+                                        return;
+                                    }
+
+                                    const link = target.closest('.toc-link[data-target]');
+                                    if (!(link instanceof HTMLElement)) {
+                                        hideLinkStatus();
+                                        return;
+                                    }
+
+                                    showLinkStatus(link.dataset.target || '');
+                                });
+
+                                tocContainer.addEventListener('mouseout', function (event) {
+                                    const relatedTarget = event.relatedTarget;
+                                    if (relatedTarget instanceof Node && tocContainer.contains(relatedTarget)) {
+                                        return;
+                                    }
+
+                                    hideLinkStatus();
+                                });
+
+                                tocContainer.addEventListener('focusin', function (event) {
+                                    const target = event.target;
+                                    if (!(target instanceof HTMLElement)) {
+                                        return;
+                                    }
+
+                                    const link = target.closest('.toc-link[data-target]');
+                                    if (!(link instanceof HTMLElement)) {
+                                        return;
+                                    }
+
+                                    showLinkStatus(link.dataset.target || '');
+                                });
+
+                                tocContainer.addEventListener('focusout', function (event) {
+                                    const relatedTarget = event.relatedTarget;
+                                    if (relatedTarget instanceof Node && tocContainer.contains(relatedTarget)) {
+                                        return;
+                                    }
+
+                                    hideLinkStatus();
+                                });
+
                                 tocContainer.addEventListener('click', function (event) {
                                     const target = event.target;
                                     if (!(target instanceof Element)) {
                                         return;
                                     }
 
-                                    const link = target.closest('a[href^="#"]');
-                                    if (!(link instanceof HTMLAnchorElement)) {
+                                    const link = target.closest('.toc-link[data-target]');
+                                    if (!(link instanceof HTMLElement)) {
                                         return;
                                     }
 
-                                    const href = link.getAttribute('href');
-                                    if (!href || href.length < 2) {
+                                    const targetSelector = link.dataset.target;
+                                    if (!targetSelector || targetSelector.length < 2) {
                                         return;
                                     }
 
-                                    const section = document.querySelector(href);
+                                    const section = document.querySelector(targetSelector);
                                     if (!(section instanceof HTMLElement)) {
                                         return;
                                     }
 
                                     event.preventDefault();
+                                    hideLinkStatus();
                                     animateTo(section.offsetTop, 620);
 
                                     if (history && typeof history.replaceState === 'function') {
-                                        history.replaceState(null, '', href);
+                                        history.replaceState(null, '', targetSelector);
                                     }
                                 });
                             }
@@ -179,6 +249,8 @@ def build_handbook():
                 {toc}
 
                 {chapters_content}
+
+                <div id="link-status" class="link-status" aria-hidden="true"></div>
 
                 <div class="floating-controls" aria-label="Page navigation controls">
                     <button id="btn-prev-page" type="button" class="floating-btn">Prev Page</button>
