@@ -13,7 +13,7 @@
       min-height: 100%;
       overflow-y: auto;
       overflow-x: hidden;
-      -webkit-overflow-scrolling: touch;
+
       box-sizing: border-box;
       font-family: Arial, sans-serif;
       font-size: 11pt;
@@ -36,6 +36,10 @@
       box-sizing: border-box;
       position: relative;
       page-break-after: always;
+    }
+
+    .page>h2:first-of-type {
+      margin-top: 0;
     }
 
     h1,
@@ -102,6 +106,43 @@
       font-size: 12pt;
     }
 
+    .code-wrapper {
+      position: relative;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      padding: 4px 10px;
+      border: none;
+      border-radius: 4px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.15s ease, background 0.15s ease;
+      z-index: 1;
+    }
+
+    .code-wrapper:hover .copy-btn,
+    .copy-btn:focus-visible {
+      opacity: 1;
+    }
+
+    .copy-btn.copied {
+      background: #4caf50;
+      opacity: 1;
+    }
+
+    @media print {
+      .copy-btn {
+        display: none;
+      }
+    }
+
     pre {
       background-color: var(--code-bg);
       border-left: 4px solid var(--primary);
@@ -110,6 +151,8 @@
       font-size: 10pt;
       overflow-x: auto;
       border-radius: 0 4px 4px 0;
+      max-height: 70vh;
+      overflow-y: auto;
     }
 
     code {
@@ -223,6 +266,16 @@
       color: var(--primary);
     }
 
+    .toc-section {
+      font-weight: 700;
+      font-size: 10pt;
+      color: var(--primary);
+      letter-spacing: 0.5px;
+      border-bottom: none;
+      margin-top: 10px;
+      padding-top: 6px;
+    }
+
     .toc-list a:visited {
       color: var(--text);
     }
@@ -293,6 +346,11 @@
         display: block;
       }
 
+      pre {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+
       .page {
         box-shadow: none;
         margin: 0;
@@ -304,6 +362,7 @@
     }
 
     @media screen and (max-width: 900px) {
+
       html,
       body {
         scrollbar-width: auto;
@@ -424,6 +483,11 @@
       background: #00796b;
     }
 
+    .floating-btn:focus-visible {
+      outline: 2px solid #fff;
+      outline-offset: 2px;
+    }
+
     .floating-btn:disabled {
       background: #9fb4b1;
       cursor: not-allowed;
@@ -471,7 +535,114 @@
       color: white;
     }
 
-    ::-moz-selection {
+    /* Progress Bar */
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
       background: var(--primary);
-      color: white;
+      z-index: 1300;
+      transition: width 0.1s linear;
+    }
+
+    @media print {
+      .progress-bar {
+        display: none;
+      }
+    }
+
+    /* Dark Mode */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --text: #E0E0E0;
+        --code-bg: #1E1E1E;
+      }
+
+      body {
+        background-color: #121212;
+      }
+
+      .page {
+        background: #1a1a2e;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      }
+
+      .cover-subtitle {
+        color: #aaa;
+      }
+
+      .header,
+      .footer {
+        color: #777;
+        border-color: #444;
+      }
+
+      th,
+      td {
+        border-color: #444;
+      }
+
+      th {
+        background-color: #1a3a36;
+      }
+
+      .plain-english-box {
+        background-color: #1a3a36;
+        border-color: #009688;
+      }
+
+      .mistake-box {
+        background-color: #3a1a1a;
+        border-color: #f44336;
+      }
+
+      .usage-box {
+        background-color: #3a2a1a;
+        border-color: #ff9800;
+      }
+
+      pre {
+        background-color: #1E1E1E;
+      }
+
+      code {
+        background-color: #2a2a2a;
+      }
+
+      .toc-link,
+      .toc-list a {
+        background: #1a1a2e;
+        color: var(--text);
+      }
+
+      .toc-list .page-num {
+        background: #1a1a2e;
+      }
+
+      .toc-list li {
+        border-bottom-color: #444;
+      }
+
+      .link-status {
+        background: linear-gradient(135deg, #00796b, #004d40);
+      }
+
+      a {
+        color: var(--text);
+      }
+
+      a:visited {
+        color: var(--text);
+      }
+
+      ::selection {
+        background: #00796b;
+      }
+
+      /* Highlight.js dark mode override */
+      .hljs {
+        background: #1E1E1E;
+        color: #abb2bf;
+      }
     }

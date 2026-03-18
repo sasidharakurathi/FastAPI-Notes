@@ -27,231 +27,29 @@ def build_handbook():
         with open(cf, "r", encoding="utf-8") as f:
             chapters_content += f.read() + "\n"
 
-    js_script = """
-                <script type="text/javascript">
-                    (function(c,l,a,r,i,t,y){
-                        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-                        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-                        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-                    })(window, document, "clarity", "script", "vxhj0j0zwn");
-                </script>
-    
-                <script>
-                        (function () {
-                            const pages = Array.from(document.querySelectorAll('.page'));
-                            const tocContainer = document.getElementById('toc');
-                            const prevBtn = document.getElementById('btn-prev-page');
-                            const nextBtn = document.getElementById('btn-next-page');
-                            const topBtn = document.getElementById('btn-top');
-                            const linkStatus = document.getElementById('link-status');
-                            if (!pages.length || !prevBtn || !nextBtn || !topBtn) {
-                                return;
-                            }
-
-                            let currentPage = 0;
-                            let activeAnimation = null;
-
-                            function easeInOutCubic(t) {
-                                return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-                            }
-
-                            function animateTo(targetY, duration) {
-                                const startY = window.scrollY || document.documentElement.scrollTop || 0;
-                                const maxY = Math.max(document.documentElement.scrollHeight - window.innerHeight, 0);
-                                const clampedTarget = Math.min(Math.max(targetY, 0), maxY);
-                                const distance = clampedTarget - startY;
-
-                                if (Math.abs(distance) < 1) {
-                                    window.scrollTo(0, clampedTarget);
-                                    return;
-                                }
-
-                                if (activeAnimation) {
-                                    cancelAnimationFrame(activeAnimation);
-                                    activeAnimation = null;
-                                }
-
-                                const startTime = performance.now();
-
-                                function step(now) {
-                                    const elapsed = now - startTime;
-                                    const progress = Math.min(elapsed / duration, 1);
-                                    const eased = easeInOutCubic(progress);
-                                    window.scrollTo(0, startY + (distance * eased));
-
-                                    if (progress < 1) {
-                                        activeAnimation = requestAnimationFrame(step);
-                                    } else {
-                                        activeAnimation = null;
-                                    }
-                                }
-
-                                activeAnimation = requestAnimationFrame(step);
-                            }
-
-                            function getCurrentPageIndex() {
-                                const mid = window.innerHeight * 0.5;
-                                let bestIndex = 0;
-                                let bestDistance = Number.POSITIVE_INFINITY;
-
-                                pages.forEach(function (page, index) {
-                                    const rect = page.getBoundingClientRect();
-                                    const pageMid = rect.top + rect.height * 0.5;
-                                    const distance = Math.abs(pageMid - mid);
-                                    if (distance < bestDistance) {
-                                        bestDistance = distance;
-                                        bestIndex = index;
-                                    }
-                                });
-
-                                return bestIndex;
-                            }
-
-                            function updateButtonStates() {
-                                currentPage = getCurrentPageIndex();
-                                prevBtn.disabled = currentPage <= 0;
-                                nextBtn.disabled = currentPage >= pages.length - 1;
-                            }
-
-                            function scrollToPage(index) {
-                                if (index < 0 || index >= pages.length) {
-                                    return;
-                                }
-                                const targetY = pages[index].offsetTop;
-                                animateTo(targetY, 560);
-                            }
-
-                            function getPreviewUrl(targetSelector) {
-                                return window.location.origin + window.location.pathname + targetSelector;
-                            }
-
-                            function showLinkStatus(targetSelector) {
-                                if (!linkStatus || !targetSelector) {
-                                    return;
-                                }
-
-                                linkStatus.textContent = getPreviewUrl(targetSelector);
-                                linkStatus.classList.add('is-visible');
-                            }
-
-                            function hideLinkStatus() {
-                                if (!linkStatus) {
-                                    return;
-                                }
-
-                                linkStatus.classList.remove('is-visible');
-                            }
-
-                            prevBtn.addEventListener('click', function () {
-                                updateButtonStates();
-                                scrollToPage(currentPage - 1);
-                            });
-
-                            nextBtn.addEventListener('click', function () {
-                                updateButtonStates();
-                                scrollToPage(currentPage + 1);
-                            });
-
-                            topBtn.addEventListener('click', function () {
-                                animateTo(0, 560);
-                            });
-
-                            if (tocContainer) {
-                                tocContainer.addEventListener('mouseover', function (event) {
-                                    const target = event.target;
-                                    if (!(target instanceof Element)) {
-                                        return;
-                                    }
-
-                                    const link = target.closest('.toc-link[data-target]');
-                                    if (!(link instanceof HTMLElement)) {
-                                        hideLinkStatus();
-                                        return;
-                                    }
-
-                                    showLinkStatus(link.dataset.target || '');
-                                });
-
-                                tocContainer.addEventListener('mouseout', function (event) {
-                                    const relatedTarget = event.relatedTarget;
-                                    if (relatedTarget instanceof Node && tocContainer.contains(relatedTarget)) {
-                                        return;
-                                    }
-
-                                    hideLinkStatus();
-                                });
-
-                                tocContainer.addEventListener('focusin', function (event) {
-                                    const target = event.target;
-                                    if (!(target instanceof HTMLElement)) {
-                                        return;
-                                    }
-
-                                    const link = target.closest('.toc-link[data-target]');
-                                    if (!(link instanceof HTMLElement)) {
-                                        return;
-                                    }
-
-                                    showLinkStatus(link.dataset.target || '');
-                                });
-
-                                tocContainer.addEventListener('focusout', function (event) {
-                                    const relatedTarget = event.relatedTarget;
-                                    if (relatedTarget instanceof Node && tocContainer.contains(relatedTarget)) {
-                                        return;
-                                    }
-
-                                    hideLinkStatus();
-                                });
-
-                                tocContainer.addEventListener('click', function (event) {
-                                    const target = event.target;
-                                    if (!(target instanceof Element)) {
-                                        return;
-                                    }
-
-                                    const link = target.closest('.toc-link[data-target]');
-                                    if (!(link instanceof HTMLElement)) {
-                                        return;
-                                    }
-
-                                    const targetSelector = link.dataset.target;
-                                    if (!targetSelector || targetSelector.length < 2) {
-                                        return;
-                                    }
-
-                                    const section = document.querySelector(targetSelector);
-                                    if (!(section instanceof HTMLElement)) {
-                                        return;
-                                    }
-
-                                    event.preventDefault();
-                                    hideLinkStatus();
-                                    animateTo(section.offsetTop, 620);
-
-                                    if (history && typeof history.replaceState === 'function') {
-                                        history.replaceState(null, '', targetSelector);
-                                    }
-                                });
-                            }
-
-                            window.addEventListener('scroll', updateButtonStates, { passive: true });
-                            window.addEventListener('resize', updateButtonStates);
-                            updateButtonStates();
-                        })();
-                    </script>"""
+    # Read JS
+    with open(os.path.join(src_dir, "script.js"), "r", encoding="utf-8") as f:
+        js_script = f.read()
 
     html_template = f"""<!DOCTYPE html>
         <html lang="en">
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1">
+                <meta name="description" content="A complete FastAPI handbook covering every concept with real examples, from basics to production deployment.">
+                <meta name="author" content="Sasidhar Akurathi">
+                <meta property="og:title" content="FastAPI Complete Handbook">
+                <meta property="og:description" content="Every concept. Every feature. With real examples. Based on official FastAPI docs.">
+                <meta property="og:type" content="article">
                 <title>FastAPI Complete Handbook</title>
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/atom-one-light.min.css">
                 <style>
                     {css}
                 </style>
             </head>
             <body>
+
+                <div class="progress-bar" id="progress-bar"></div>
 
                 {cover}
 
@@ -267,7 +65,47 @@ def build_handbook():
                     <button id="btn-top" type="button" class="floating-btn floating-btn-top">Top</button>
                 </div>
 
-                {js_script}
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/python.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/bash.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/json.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/dockerfile.min.js"></script>
+                <script>
+                    document.querySelectorAll('pre').forEach(function(pre) {{
+                        if (!pre.querySelector('code')) {{
+                            var code = document.createElement('code');
+                            code.className = 'language-python';
+                            code.textContent = pre.textContent;
+                            pre.textContent = '';
+                            pre.appendChild(code);
+                        }}
+                        var wrapper = document.createElement('div');
+                        wrapper.className = 'code-wrapper';
+                        pre.parentNode.insertBefore(wrapper, pre);
+                        wrapper.appendChild(pre);
+                        var btn = document.createElement('button');
+                        btn.className = 'copy-btn';
+                        btn.textContent = 'Copy';
+                        btn.type = 'button';
+                        btn.addEventListener('click', function() {{
+                            var text = pre.textContent || '';
+                            navigator.clipboard.writeText(text).then(function() {{
+                                btn.textContent = 'Copied!';
+                                btn.classList.add('copied');
+                                setTimeout(function() {{
+                                    btn.textContent = 'Copy';
+                                    btn.classList.remove('copied');
+                                }}, 1500);
+                            }});
+                        }});
+                        wrapper.appendChild(btn);
+                    }});
+                    hljs.highlightAll();
+                </script>
+
+                <script>
+                    {js_script}
+                </script>
 
             </body>
         </html>
