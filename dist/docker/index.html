@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docker for Developers</title>
+    <style>:root {
+  --primary: #0db7ed;
+  --primary-dark: #007bb5;
+  --bg-main: #121212;
+  --bg-page: #1e1e1e;
+  --text-main: #e0e0e0;
+  --text-muted: #888888;
+  --code-bg: #2d2d2d;
+  --border-color: #333333;
+}
+
+html {
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-main);
+}
+
+body {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 11pt;
+  color: var(--text-main);
+  background-color: var(--bg-main);
+  margin: 0;
+  display: flex;
+}
+
+/* Master Layout */
+.layout {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.sidebar {
+  width: 300px;
+  background: var(--bg-page);
+  border-right: 1px solid var(--border-color);
+  overflow-y: auto;
+  padding: 20px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.sidebar h3 {
+  margin-top: 0;
+  color: var(--primary);
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 10px;
+}
+
+.toc-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.toc-list li {
+  margin-bottom: 10px;
+}
+
+.toc-list a {
+  text-decoration: none;
+  color: var(--text-main);
+  font-size: 10.5pt;
+  display: block;
+  padding: 5px;
+  border-radius: 4px;
+}
+
+.toc-list a:hover, .toc-list a.active {
+  background: var(--code-bg);
+  color: var(--primary);
+}
+
+.content-wrapper {
+  flex-grow: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+/* A4 Page Formatting inside Content */
+.page {
+  background: var(--bg-page);
+  width: 210mm;
+  min-height: 297mm;
+  margin-bottom: 40px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  padding: 1in;
+  box-sizing: border-box;
+  position: relative;
+  page-break-after: always;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  color: var(--primary);
+  margin-top: 1.5em;
+}
+
+p {
+  line-height: 1.6;
+  margin-bottom: 1em;
+}
+
+/* Cover Styling */
+.cover-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 100%;
+}
+
+.cover-title {
+  font-size: 42pt;
+  margin-bottom: 20px;
+  color: var(--primary);
+}
+
+.cover-subtitle {
+  font-size: 18pt;
+  color: var(--text-muted);
+  margin-bottom: 50px;
+  font-weight: normal;
+}
+
+.cover-note {
+  font-size: 12pt;
+  font-style: italic;
+  margin-bottom: 20px;
+  color: var(--text-muted);
+}
+
+/* Code Blocks */
+pre {
+  background-color: var(--code-bg);
+  border-left: 4px solid var(--primary);
+  padding: 15px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 10pt;
+  overflow-x: auto;
+  border-radius: 0 4px 4px 0;
+  color: #dfdfdf;
+}
+
+code {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 10pt;
+  background-color: var(--code-bg);
+  padding: 2px 4px;
+  border-radius: 3px;
+  color: #ffb86c;
+}
+
+pre code {
+  color: inherit;
+  background-color: transparent;
+  padding: 0;
+}
+
+/* Callout Boxes */
+.plain-english-box {
+  background-color: #1a2f3a;
+  border: 1px solid var(--primary);
+  padding: 15px;
+  border-radius: 6px;
+  margin: 20px 0;
+}
+.plain-english-box strong { color: var(--primary); }
+
+.mistake-box {
+  background-color: #3b1c1c;
+  border-left: 4px solid #f44336;
+  padding: 15px;
+  margin: 20px 0;
+}
+
+.usage-box {
+  background-color: #332714;
+  border-left: 4px solid #ff9800;
+  padding: 15px;
+  margin: 20px 0;
+}
+
+/* Headers & Footers */
+.header {
+  position: absolute;
+  top: 0.5in;
+  left: 1in;
+  right: 1in;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 5px;
+  font-size: 9pt;
+  color: var(--text-muted);
+  text-align: right;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0.5in;
+  left: 1in;
+  right: 1in;
+  border-top: 1px solid var(--border-color);
+  padding-top: 5px;
+  font-size: 9pt;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Navigation Buttons */
+.nav-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 50px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+}
+.nav-btn {
+  background-color: var(--primary);
+  color: #fff;
+  padding: 10px 20px;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: bold;
+}
+.nav-btn:hover { background-color: var(--primary-dark); }
+.nav-btn.disabled { background-color: var(--border-color); color: var(--text-muted); pointer-events: none; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 25px 0;
+}
+
+th, td {
+  border: 1px solid var(--border-color);
+  padding: 12px;
+  text-align: left;
+}
+
+th {
+  background-color: #1a2f3a;
+  color: var(--primary);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-main);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(13, 183, 237, 0.4);
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+::selection {
+  background: var(--primary);
+  color: #fff;
+}
+::-moz-selection {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* Responsive Scaling */
+@media screen and (max-width: 1200px) {
+  .sidebar { width: 250px; }
+}
+
+@media screen and (max-width: 950px) {
+  .sidebar { display: none; }
+  .content-wrapper { padding: 10px; }
+  
+  html {
+    zoom: calc(100vw / 850); /* Scale the A4 page directly on mobile */
+  }
+
+  ::-webkit-scrollbar {
+    width: 32px;
+    height: 32px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border: 10px solid transparent;
+    background-clip: padding-box;
+    border-radius: 20px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+</style>
+</head>
+<body>
+    <div class="layout">
+        <nav class="sidebar">
+            <h3>Table of Contents</h3>
+            <ul class="toc-list">
+<li><a href="chapter_01.html">CHAPTER 1 — Why Docker? (The Mental Model)</a></li>
+</ul>
+        </nav>
+        <main class="content-wrapper">
+            <div class="page cover-page">
+    <h1 class="cover-title">Docker for Developers</h1>
+    <div class="cover-subtitle">Complete Handbook Notes. Zero Fluff.</div>
+    <div class="cover-note">The definitive cheat-sheet-meets-deep-dive that a developer keeps open in a second tab.
+    </div>
+    <div class="cover-note">Author: <b>Sasidhar Akurathi</b></div>
+    <div class="cover-note">Made with help of Gemini 3 Flash</div>
+</div>
+            <div class="nav-buttons"><a href="chapter_01.html" class="nav-btn">Start Reading →</a></div>
+        </main>
+    </div>
+</body>
+</html>

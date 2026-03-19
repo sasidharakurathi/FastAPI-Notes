@@ -1,4 +1,10 @@
-    :root {
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI Complete Handbook</title>
+    <style>    :root {
       --primary: #009688;
       --text: #2D2D2D;
       --code-bg: #F5F5F5;
@@ -13,17 +19,77 @@
       min-height: 100%;
       overflow-y: auto;
       overflow-x: hidden;
-
+      -webkit-overflow-scrolling: touch;
       box-sizing: border-box;
       font-family: Arial, sans-serif;
       font-size: 11pt;
       color: var(--text);
       background-color: #e9ecef;
       margin: 0;
+      display: flex;
+    }
+
+    /* Master Layout */
+    .layout {
+      display: flex;
+      width: 100%;
+      height: 100%;
+    }
+
+    .sidebar {
+      width: 300px;
+      background: white;
+      border-right: 1px solid #ddd;
+      overflow-y: auto;
       padding: 20px;
+      box-sizing: border-box;
+      flex-shrink: 0;
+    }
+
+    .sidebar h3 {
+      margin-top: 0;
+      color: var(--primary);
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 10px;
+    }
+
+    .content-wrapper {
+      flex-grow: 1;
+      overflow-y: auto;
       display: flex;
       flex-direction: column;
       align-items: center;
+      padding: 40px 20px;
+      background-color: #e9ecef;
+    }
+
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 50px;
+      padding-top: 20px;
+      border-top: 1px solid #ddd;
+      width: 210mm;
+    }
+
+    .nav-btn {
+      background-color: var(--primary);
+      color: #fff;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    .nav-btn:hover {
+      background-color: #00796b;
+      color: white;
+    }
+
+    .nav-btn.disabled {
+      background-color: #ddd;
+      color: #888;
+      pointer-events: none;
     }
 
     .page {
@@ -370,10 +436,16 @@
       }
 
       body {
-        padding: 10px;
-        padding-bottom: 96px;
+        padding: 0;
         align-items: stretch;
-        overflow-y: scroll;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .content-wrapper {
+        padding: 10px;
       }
 
       .page {
@@ -383,6 +455,10 @@
         padding: 18px;
         margin-bottom: 14px;
         border-radius: 8px;
+      }
+
+      .nav-buttons {
+        width: 100%;
       }
 
       .header,
@@ -645,4 +721,143 @@
         background: #1E1E1E;
         color: #abb2bf;
       }
-    }
+    }</style>
+</head>
+<body>
+    <div class="layout">
+        <nav class="sidebar">
+            <h3>Table of Contents</h3>
+            <ul class="toc-list">
+<li><a href="chapter_01.html">CHAPTER 1 - What is FastAPI and Why Should You Care?</a></li>
+<li><a href="chapter_02.html">CHAPTER 2 - Setting Up Our First FastAPI App</a></li>
+<li><a href="chapter_03.html">CHAPTER 3 - Path Operations (The Building Blocks)</a></li>
+<li><a href="chapter_04.html">CHAPTER 4 - Path Parameters</a></li>
+<li><a href="chapter_05.html">CHAPTER 5 - Query Parameters</a></li>
+<li><a href="chapter_06.html">CHAPTER 6 - Request Bodies</a></li>
+<li><a href="chapter_07.html">CHAPTER 7 - Body Fields & Nested Models</a></li>
+<li><a href="chapter_08.html">CHAPTER 8 - Request Examples & Schema Configuration</a></li>
+<li><a href="chapter_09.html">CHAPTER 9 - Extra Data Types</a></li>
+<li><a href="chapter_10.html">CHAPTER 10 - Cookie Parameters</a></li>
+<li><a href="chapter_11.html">CHAPTER 11 - Header Parameters</a></li>
+<li><a href="chapter_12.html">CHAPTER 12 - Response Model & Status Codes</a></li>
+<li><a href="chapter_13.html">CHAPTER 13 - Form Data</a></li>
+<li><a href="chapter_14.html">CHAPTER 14 - File Uploads</a></li>
+<li><a href="chapter_15.html">CHAPTER 15 - Handling Errors</a></li>
+<li><a href="chapter_16.html">CHAPTER 16 - Introduction to Dependencies</a></li>
+<li><a href="chapter_17.html">CHAPTER 17 - Security Overview</a></li>
+<li><a href="chapter_18.html">CHAPTER 18 - OAuth2 Password Flow (Basic)</a></li>
+<li><a href="chapter_19.html">CHAPTER 19 - JWT Authentication</a></li>
+<li><a href="chapter_20.html">CHAPTER 20 - Middleware</a></li>
+<li><a href="chapter_21.html">CHAPTER 21 - CORS (Cross-Origin Resource Sharing)</a></li>
+<li><a href="chapter_22.html">CHAPTER 22 - APIRouter (Splitting Your App)</a></li>
+<li><a href="chapter_23.html">CHAPTER 23 - Bigger Applications Structure</a></li>
+<li><a href="chapter_24.html">CHAPTER 24 - Background Tasks</a></li>
+<li><a href="chapter_25.html">CHAPTER 25 - Static Files</a></li>
+<li><a href="chapter_26.html">CHAPTER 26 - SQL Databases</a></li>
+<li><a href="chapter_27.html">CHAPTER 27 - Custom Responses</a></li>
+<li><a href="chapter_28.html">CHAPTER 28 - WebSockets</a></li>
+<li><a href="chapter_29.html">CHAPTER 29 - Async & Concurrency Deep Dive</a></li>
+<li><a href="chapter_30.html">CHAPTER 30 - Settings & Configuration</a></li>
+<li><a href="chapter_31.html">CHAPTER 31 - Templates (Jinja2)</a></li>
+<li><a href="chapter_32.html">CHAPTER 32 - Concepts Before Deploying</a></li>
+<li><a href="chapter_33.html">CHAPTER 33 - Docker Deployment</a></li>
+<li><a href="chapter_34.html">CHAPTER 34 - Production Checklist</a></li>
+<li><a href="chapter_35.html">CHAPTER 35 - FastAPI & APIRouter Reference</a></li>
+<li><a href="chapter_36.html">CHAPTER 36 - HTTP Status Codes Reference</a></li>
+<li><a href="chapter_37.html">CHAPTER 37 - Recommended Libraries Ecosystem</a></li>
+<li><a href="chapter_38.html">CHAPTER 38 - FastAPI Cheat Sheet</a></li>
+<li><a href="chapter_39.html">CHAPTER 39 - Architecture & Patterns</a></li>
+</ul>
+        </nav>
+        <main class="content-wrapper">
+            <!-- Chapter 10 Page 1 -->
+<div class="page" id="chapter-10">
+    <div class="header">CHAPTER 10 - Cookie Parameters</div>
+
+    <h2 style="margin-top: 0;">CHAPTER 10 - Cookie Parameters</h2>
+
+    <h3>What is a Cookie?</h3>
+    <p>A cookie is a tiny piece of data that a website asks our browser to store. Think of it like a coat check ticket.
+        When we arrive, the restaurant gives us a ticket. Whenever we walk past the front desk again, we show them the
+        ticket so they know who we are.</p>
+
+    <p>Every time our browser talks to the API, it automatically brings all its stored cookies along for the ride. We
+        usually use cookies to remember if a user is logged in, or to track their shopping cart across multiple days.
+    </p>
+
+    <div class="plain-english-box">
+        <strong>In plain English:</strong> Cookies are small text files stored in our browser that automatically get
+        sent to the server with every request. They help the server remember who we are.
+    </div>
+
+    <h3>Reading Cookies with Cookie()</h3>
+    <p>Reading a cookie in FastAPI is exactly identical to reading a Query or Path parameter. We just import
+        <code>Cookie</code> and declare it in our function.
+    </p>
+
+    <pre>
+from fastapi import Cookie, FastAPI
+
+app = FastAPI()
+
+@app.get("/items/")
+def read_items(session_id: str = Cookie(default=None)):
+    return {"session_id": session_id}
+  </pre>
+
+    <p>Let's look at this carefully:</p>
+    <p><strong>Line 1:</strong> We import <code>Cookie</code> from the main <code>fastapi</code> package.</p>
+    <p><strong>Line 6:</strong> By assigning <code>= Cookie(default=None)</code>, we explicitly tell FastAPI that
+        <code>session_id</code> must be pulled from the browser's hidden cookies, NOT from a query parameter. Without
+        the <code>Cookie()</code> declaration, FastAPI would assume it was a normal query parameter at the end of the
+        URL.
+    </p>
+
+    <div class="mistake-box">
+        <strong>⚠️ Common Mistake:</strong> Confusing headers, queries, and cookies. If we forget to wrap the variable
+        in <code>Cookie()</code>, FastAPI will stubbornly look for it in the wrong place!
+    </div>
+
+    <h3>Cookie Models with Pydantic</h3>
+    <p>What if we expect multiple cookies? We could list them one by one in the function arguments, but that gets messy.
+        Just like with request bodies, we can build a Pydantic model to instantly validate and group multiple cookies
+        together.</p>
+
+    <pre>
+from pydantic import BaseModel
+from fastapi import Cookie, FastAPI
+
+class Cookies(BaseModel):
+    session_id: str
+    facebook_tracker: str = None
+
+app = FastAPI()
+
+@app.get("/items/")
+def read_items(cookies: Cookies = Cookie()):
+    return cookies
+  </pre>
+
+    <p><strong>Line 11:</strong> Instead of asking for a string, we ask for our entire <code>Cookies</code> Pydantic
+        model, and we tell FastAPI to build it entirely out of browser cookies by using <code>= Cookie()</code>. If the
+        browser does not provide a <code>session_id</code> cookie, Pydantic immediately blocks the request because it is
+        marked as required.</p>
+
+    <h3>Setting Cookies</h3>
+    <p>So far, we have only talked about <strong>reading</strong> cookies that the browser sends to us. How do we
+        actually <strong>give</strong> the browser a new cookie to store?</p>
+
+    <p>This involves modifying the outgoing response directly, rather than just returning a simple dictionary. Because
+        this fundamentally changes how we write our route functions, we will skip it for now and cover it fully in the
+        Advanced sections later in our journey.</p>
+
+    <div class="footer">
+        <span>FastAPI Complete Handbook</span>
+        <span>Page 27</span>
+    </div>
+</div>
+            <div class="nav-buttons"><a href="chapter_09.html" class="nav-btn">← Previous</a><a href="chapter_11.html" class="nav-btn">Next →</a></div>
+        </main>
+    </div>
+</body>
+</html>

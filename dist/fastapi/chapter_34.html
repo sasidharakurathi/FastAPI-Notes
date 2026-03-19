@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI Complete Handbook</title>
+    <style>    :root {
+      --primary: #009688;
+      --text: #2D2D2D;
+      --code-bg: #F5F5F5;
+    }
+
+    html {
+      min-height: 100%;
+      overflow-x: hidden;
+    }
+
+    body {
+      min-height: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+      font-size: 11pt;
+      color: var(--text);
+      background-color: #e9ecef;
+      margin: 0;
+      display: flex;
+    }
+
+    /* Master Layout */
+    .layout {
+      display: flex;
+      width: 100%;
+      height: 100%;
+    }
+
+    .sidebar {
+      width: 300px;
+      background: white;
+      border-right: 1px solid #ddd;
+      overflow-y: auto;
+      padding: 20px;
+      box-sizing: border-box;
+      flex-shrink: 0;
+    }
+
+    .sidebar h3 {
+      margin-top: 0;
+      color: var(--primary);
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 10px;
+    }
+
+    .content-wrapper {
+      flex-grow: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      background-color: #e9ecef;
+    }
+
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 50px;
+      padding-top: 20px;
+      border-top: 1px solid #ddd;
+      width: 210mm;
+    }
+
+    .nav-btn {
+      background-color: var(--primary);
+      color: #fff;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    .nav-btn:hover {
+      background-color: #00796b;
+      color: white;
+    }
+
+    .nav-btn.disabled {
+      background-color: #ddd;
+      color: #888;
+      pointer-events: none;
+    }
+
+    .page {
+      background: white;
+      width: 210mm;
+      min-height: 297mm;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      padding: 1in;
+      box-sizing: border-box;
+      position: relative;
+      page-break-after: always;
+    }
+
+    .page>h2:first-of-type {
+      margin-top: 0;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-family: Arial, sans-serif;
+      font-weight: bold;
+      color: var(--primary);
+      margin-top: 1.5em;
+    }
+
+    p {
+      line-height: 1.6;
+      margin-bottom: 1em;
+    }
+
+    a {
+      color: var(--text);
+      transition: color 0.2s ease;
+    }
+
+    a:hover,
+    a:focus-visible,
+    a:visited:hover,
+    a:visited:focus-visible {
+      color: var(--primary);
+    }
+
+    a:visited {
+      color: var(--text);
+    }
+
+    .cover-page {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .cover-title {
+      font-size: 42pt;
+      margin-bottom: 20px;
+      color: var(--primary);
+    }
+
+    .cover-subtitle {
+      font-size: 18pt;
+      color: #555;
+      margin-bottom: 50px;
+      font-weight: normal;
+    }
+
+    .cover-note {
+      font-size: 12pt;
+      font-style: italic;
+      margin-bottom: 20px;
+    }
+
+    .cover-date {
+      font-size: 12pt;
+    }
+
+    .code-wrapper {
+      position: relative;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      padding: 4px 10px;
+      border: none;
+      border-radius: 4px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.15s ease, background 0.15s ease;
+      z-index: 1;
+    }
+
+    .code-wrapper:hover .copy-btn,
+    .copy-btn:focus-visible {
+      opacity: 1;
+    }
+
+    .copy-btn.copied {
+      background: #4caf50;
+      opacity: 1;
+    }
+
+    @media print {
+      .copy-btn {
+        display: none;
+      }
+    }
+
+    pre {
+      background-color: var(--code-bg);
+      border-left: 4px solid var(--primary);
+      padding: 15px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 10pt;
+      overflow-x: auto;
+      border-radius: 0 4px 4px 0;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+
+    code {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 10pt;
+      background-color: var(--code-bg);
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
+
+    pre code {
+      background-color: transparent;
+      padding: 0;
+    }
+
+    .plain-english-box {
+      background-color: #e0f2f1;
+      border: 1px solid var(--primary);
+      padding: 15px;
+      border-radius: 6px;
+      margin: 20px 0;
+    }
+
+    .plain-english-box strong {
+      color: var(--primary);
+    }
+
+    .mistake-box {
+      background-color: #ffebee;
+      border-left: 4px solid #f44336;
+      padding: 15px;
+      margin: 20px 0;
+    }
+
+    .usage-box {
+      background-color: #fff3e0;
+      border-left: 4px solid #ff9800;
+      padding: 15px;
+      margin: 20px 0;
+    }
+
+    .header {
+      position: absolute;
+      top: 0.5in;
+      left: 1in;
+      right: 1in;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 5px;
+      font-size: 9pt;
+      color: #888;
+      text-align: right;
+    }
+
+    .footer {
+      position: absolute;
+      bottom: 0.5in;
+      left: 1in;
+      right: 1in;
+      border-top: 1px solid #ddd;
+      padding-top: 5px;
+      font-size: 9pt;
+      color: #888;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 25px 0;
+    }
+
+    th,
+    td {
+      border: 1px solid #ccc;
+      padding: 12px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #e0f2f1;
+      color: var(--primary);
+    }
+
+    .toc-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .toc-list li {
+      margin-bottom: 15px;
+      position: relative;
+      border-bottom: 1px dotted #ccc;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .toc-list a {
+      text-decoration: none;
+      color: var(--text);
+      background: white;
+      padding-right: 10px;
+      position: relative;
+      bottom: -5px;
+    }
+
+    .toc-list a:hover,
+    .toc-list a:focus-visible,
+    .toc-list a:visited:hover,
+    .toc-list a:visited:focus-visible {
+      color: var(--primary);
+    }
+
+    .toc-section {
+      font-weight: 700;
+      font-size: 10pt;
+      color: var(--primary);
+      letter-spacing: 0.5px;
+      border-bottom: none;
+      margin-top: 10px;
+      padding-top: 6px;
+    }
+
+    .toc-list a:visited {
+      color: var(--text);
+    }
+
+    .toc-link {
+      appearance: none;
+      border: 0;
+      background: white;
+      color: var(--text);
+      padding: 0 10px 0 0;
+      margin: 0;
+      font: inherit;
+      text-align: left;
+      position: relative;
+      bottom: -5px;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+
+    .toc-link:hover,
+    .toc-link:focus-visible {
+      color: var(--primary);
+    }
+
+    .link-status {
+      position: fixed;
+      left: 14px;
+      bottom: 14px;
+      z-index: 1200;
+      max-width: min(520px, calc(100vw - 28px));
+      padding: 8px 12px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #009688, #0b7d71);
+      color: #f4fffd;
+      font-size: 10pt;
+      line-height: 1.3;
+      box-shadow: 0 10px 24px rgba(0, 121, 107, 0.28);
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .link-status.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .toc-list .page-num {
+      background: white;
+      padding-left: 10px;
+      position: relative;
+      bottom: -5px;
+    }
+
+    @page {
+      size: A4;
+      margin: 0;
+    }
+
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+        display: block;
+      }
+
+      pre {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+
+      .page {
+        box-shadow: none;
+        margin: 0;
+        width: 100%;
+        min-height: 297mm;
+        page-break-after: always;
+        padding: 1in;
+      }
+    }
+
+    @media screen and (max-width: 900px) {
+
+      html,
+      body {
+        scrollbar-width: auto;
+        scrollbar-color: #009688 #d9e3e3;
+      }
+
+      body {
+        padding: 0;
+        align-items: stretch;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .content-wrapper {
+        padding: 10px;
+      }
+
+      .page {
+        width: 100%;
+        max-width: 100%;
+        min-height: 0;
+        padding: 18px;
+        margin-bottom: 14px;
+        border-radius: 8px;
+      }
+
+      .nav-buttons {
+        width: 100%;
+      }
+
+      .header,
+      .footer {
+        position: static;
+        left: auto;
+        right: auto;
+      }
+
+      .link-status {
+        left: 10px;
+        right: 10px;
+        bottom: 68px;
+        max-width: none;
+      }
+
+      .header {
+        margin-bottom: 10px;
+      }
+
+      .footer {
+        margin-top: 14px;
+      }
+
+      .cover-title {
+        font-size: clamp(30px, 8vw, 42pt);
+      }
+
+      .cover-subtitle {
+        font-size: clamp(14px, 4vw, 18pt);
+        margin-bottom: 24px;
+      }
+
+      .toc-list li {
+        gap: 10px;
+        align-items: flex-start;
+      }
+
+      .toc-list .page-num {
+        white-space: nowrap;
+      }
+
+      table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+
+      pre {
+        font-size: 9pt;
+      }
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(0, 150, 136, 0.4);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 150, 136, 0.8);
+    }
+
+    .floating-controls {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 1200;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .floating-btn {
+      border: none;
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: rgba(0, 150, 136, 0.96);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      min-width: 112px;
+    }
+
+    .floating-btn:hover:not(:disabled) {
+      background: #00796b;
+    }
+
+    .floating-btn:focus-visible {
+      outline: 2px solid #fff;
+      outline-offset: 2px;
+    }
+
+    .floating-btn:disabled {
+      background: #9fb4b1;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .floating-btn-top {
+      background: rgba(38, 50, 56, 0.95);
+    }
+
+    @media screen and (max-width: 900px) {
+      .floating-controls {
+        left: 50%;
+        right: auto;
+        bottom: 8px;
+        transform: translateX(-50%);
+        width: calc(100% - 20px);
+        max-width: 430px;
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 8px;
+        border-radius: 999px;
+        background: rgba(233, 236, 239, 0.94);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
+      }
+
+      .floating-btn {
+        min-width: 0;
+        flex: 1;
+        padding: 12px 10px;
+        font-size: 14px;
+      }
+    }
+
+    @media print {
+      .floating-controls {
+        display: none;
+      }
+    }
+
+    /* Custom Text Selection */
+    ::selection {
+      background: var(--primary);
+      color: white;
+    }
+
+    /* Progress Bar */
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: var(--primary);
+      z-index: 1300;
+      transition: width 0.1s linear;
+    }
+
+    @media print {
+      .progress-bar {
+        display: none;
+      }
+    }
+
+    /* Dark Mode */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --text: #E0E0E0;
+        --code-bg: #1E1E1E;
+      }
+
+      body {
+        background-color: #121212;
+      }
+
+      .page {
+        background: #1a1a2e;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      }
+
+      .cover-subtitle {
+        color: #aaa;
+      }
+
+      .header,
+      .footer {
+        color: #777;
+        border-color: #444;
+      }
+
+      th,
+      td {
+        border-color: #444;
+      }
+
+      th {
+        background-color: #1a3a36;
+      }
+
+      .plain-english-box {
+        background-color: #1a3a36;
+        border-color: #009688;
+      }
+
+      .mistake-box {
+        background-color: #3a1a1a;
+        border-color: #f44336;
+      }
+
+      .usage-box {
+        background-color: #3a2a1a;
+        border-color: #ff9800;
+      }
+
+      pre {
+        background-color: #1E1E1E;
+      }
+
+      code {
+        background-color: #2a2a2a;
+      }
+
+      .toc-link,
+      .toc-list a {
+        background: #1a1a2e;
+        color: var(--text);
+      }
+
+      .toc-list .page-num {
+        background: #1a1a2e;
+      }
+
+      .toc-list li {
+        border-bottom-color: #444;
+      }
+
+      .link-status {
+        background: linear-gradient(135deg, #00796b, #004d40);
+      }
+
+      a {
+        color: var(--text);
+      }
+
+      a:visited {
+        color: var(--text);
+      }
+
+      ::selection {
+        background: #00796b;
+      }
+
+      /* Highlight.js dark mode override */
+      .hljs {
+        background: #1E1E1E;
+        color: #abb2bf;
+      }
+    }</style>
+</head>
+<body>
+    <div class="layout">
+        <nav class="sidebar">
+            <h3>Table of Contents</h3>
+            <ul class="toc-list">
+<li><a href="chapter_01.html">CHAPTER 1 - What is FastAPI and Why Should You Care?</a></li>
+<li><a href="chapter_02.html">CHAPTER 2 - Setting Up Our First FastAPI App</a></li>
+<li><a href="chapter_03.html">CHAPTER 3 - Path Operations (The Building Blocks)</a></li>
+<li><a href="chapter_04.html">CHAPTER 4 - Path Parameters</a></li>
+<li><a href="chapter_05.html">CHAPTER 5 - Query Parameters</a></li>
+<li><a href="chapter_06.html">CHAPTER 6 - Request Bodies</a></li>
+<li><a href="chapter_07.html">CHAPTER 7 - Body Fields & Nested Models</a></li>
+<li><a href="chapter_08.html">CHAPTER 8 - Request Examples & Schema Configuration</a></li>
+<li><a href="chapter_09.html">CHAPTER 9 - Extra Data Types</a></li>
+<li><a href="chapter_10.html">CHAPTER 10 - Cookie Parameters</a></li>
+<li><a href="chapter_11.html">CHAPTER 11 - Header Parameters</a></li>
+<li><a href="chapter_12.html">CHAPTER 12 - Response Model & Status Codes</a></li>
+<li><a href="chapter_13.html">CHAPTER 13 - Form Data</a></li>
+<li><a href="chapter_14.html">CHAPTER 14 - File Uploads</a></li>
+<li><a href="chapter_15.html">CHAPTER 15 - Handling Errors</a></li>
+<li><a href="chapter_16.html">CHAPTER 16 - Introduction to Dependencies</a></li>
+<li><a href="chapter_17.html">CHAPTER 17 - Security Overview</a></li>
+<li><a href="chapter_18.html">CHAPTER 18 - OAuth2 Password Flow (Basic)</a></li>
+<li><a href="chapter_19.html">CHAPTER 19 - JWT Authentication</a></li>
+<li><a href="chapter_20.html">CHAPTER 20 - Middleware</a></li>
+<li><a href="chapter_21.html">CHAPTER 21 - CORS (Cross-Origin Resource Sharing)</a></li>
+<li><a href="chapter_22.html">CHAPTER 22 - APIRouter (Splitting Your App)</a></li>
+<li><a href="chapter_23.html">CHAPTER 23 - Bigger Applications Structure</a></li>
+<li><a href="chapter_24.html">CHAPTER 24 - Background Tasks</a></li>
+<li><a href="chapter_25.html">CHAPTER 25 - Static Files</a></li>
+<li><a href="chapter_26.html">CHAPTER 26 - SQL Databases</a></li>
+<li><a href="chapter_27.html">CHAPTER 27 - Custom Responses</a></li>
+<li><a href="chapter_28.html">CHAPTER 28 - WebSockets</a></li>
+<li><a href="chapter_29.html">CHAPTER 29 - Async & Concurrency Deep Dive</a></li>
+<li><a href="chapter_30.html">CHAPTER 30 - Settings & Configuration</a></li>
+<li><a href="chapter_31.html">CHAPTER 31 - Templates (Jinja2)</a></li>
+<li><a href="chapter_32.html">CHAPTER 32 - Concepts Before Deploying</a></li>
+<li><a href="chapter_33.html">CHAPTER 33 - Docker Deployment</a></li>
+<li><a href="chapter_34.html">CHAPTER 34 - Production Checklist</a></li>
+<li><a href="chapter_35.html">CHAPTER 35 - FastAPI & APIRouter Reference</a></li>
+<li><a href="chapter_36.html">CHAPTER 36 - HTTP Status Codes Reference</a></li>
+<li><a href="chapter_37.html">CHAPTER 37 - Recommended Libraries Ecosystem</a></li>
+<li><a href="chapter_38.html">CHAPTER 38 - FastAPI Cheat Sheet</a></li>
+<li><a href="chapter_39.html">CHAPTER 39 - Architecture & Patterns</a></li>
+</ul>
+        </nav>
+        <main class="content-wrapper">
+            <!-- Chapter 34 Page 1 -->
+<div class="page" id="chapter-34">
+    <div class="header">CHAPTER 34 - Production Checklist</div>
+
+    <h2 style="margin-top: 0;">CHAPTER 34 - Production Checklist</h2>
+
+    <h3>The Launch Day Survival Guide</h3>
+    <p>We are finally ready to take our beautiful FastAPI code and deploy it to the world. But before we push the launch
+        button, we absolutely must review this ultimate checklist. If we skip these steps, our app will crash under
+        heavy traffic, or worse, expose our company to massive security failures.</p>
+
+    <h4>1. Turn Off Debug Mode (and Hide the Docs)</h4>
+    <p>While coding on our laptops, those massive, red error traces are incredibly helpful. In production, if an error
+        trace prints out to the browser, a hacker could see our raw SQL queries and file paths! Furthermore, we might
+        not want the entire internet to be able to access our beautiful <code>/docs</code> URL.</p>
+    <pre>
+# main.py
+app = FastAPI(
+    debug=False,       # NEVER leave this True in production!
+    docs_url=None,     # Hide the Swagger UI from the public
+    redoc_url=None     # Hide ReDoc from the public
+)
+  </pre>
+
+    <h4>2. Use Environment Variables for Secrets</h4>
+    <p>As we covered in Chapter 30, never hardcode <code>DATABASE_URL</code>, <code>SECRET_KEY</code>, or API tokens. We
+        must use Pydantic <code>BaseSettings</code> to pull them securely from the server OS at runtime.</p>
+
+    <h4>3. Enable HTTPS (Non-Negotiable)</h4>
+    <p>Never run a production API on bare HTTP. We must place Nginx, Traefik, or an AWS Application Load Balancer in
+        front of our Uvicorn workers to perfectly wrap all our traffic in TLS/SSL encryption using Let's Encrypt.</p>
+
+    <h4>4. Configure Worker Count</h4>
+    <p>A single Uvicorn instance on an 8-core server wastes 87% of the machine's potential. We must configure Gunicorn
+        or Docker to spin up multiple workers. Remember the golden formula:<br>
+        <strong>Workers = (CPU Cores x 2) + 1</strong>
+    </p>
+
+    <div class="footer">
+        <span>FastAPI Complete Handbook</span>
+        <span>Page 92</span>
+    </div>
+</div>
+
+<!-- Chapter 34 Page 2 -->
+<div class="page">
+    <div class="header">CHAPTER 34 - Production Checklist</div>
+
+    <h4>5. Handle Lifespan Properly</h4>
+    <p>When our server boots up, we might need to load a massive 2GB Machine Learning model into memory before we accept
+        any traffic. When our server shuts down, we must politely disconnect from the Postgres database rather than just
+        violently killing the power.</p>
+    <p>FastAPI provides a beautiful <code>lifespan</code> manager for exactly this:</p>
+    <pre>
+from contextlib import asynccontextmanager
+from fastapi import FastAPI
+
+# The dictionary that holds our massive shared memory
+ml_models = {}
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # This runs exactly once, BEFORE the server starts taking traffic!
+    ml_models["spam_filter"] = "Loading 2GB model..."
+    yield
+    # This runs exactly once, right as the server is shutting down!
+    ml_models.clear()
+    print("Safely disconnected from the database.")
+
+app = FastAPI(lifespan=lifespan)
+  </pre>
+
+    <h4>6. Set Up Proper Logging</h4>
+    <p>If our API crashes at 3:00 AM, we will not be staring at the Uvicorn terminal to see what went wrong. We must
+        configure Python's standard `logging` module to physically write all errors into a permanent file, or send them
+        to an external dashboard like Datadog or Sentry.</p>
+
+    <h4>7. Set Up Monitoring & Health Checks</h4>
+    <p>We must have a simple <code>/health</code> endpoint returning a 200 OK JSON response. Our cloud provider (AWS,
+        Azure, Kubernetes) will repeatedly ping this route. If it fails, our cloud provider knows our Python code froze,
+        and it will automatically reboot the Docker container for us instantly.</p>
+
+    <div class="footer">
+        <span>FastAPI Complete Handbook</span>
+        <span>Page 93</span>
+    </div>
+</div>
+
+<!-- Chapter 34 Page 3 -->
+<div class="page">
+    <div class="header">CHAPTER 34 - Production Checklist</div>
+
+    <h4>8. Rate Limiting (Using SlowAPI)</h4>
+    <p>If a malicious user writes a script to hit our "Login" route 10,000 times a second guessing passwords, our entire
+        database will catch on fire and all our legitimate customers will be locked out.</p>
+
+    <p>FastAPI doesn't have a native rate limiter, but the community heavily relies on an incredible tool called
+        <strong>SlowAPI</strong>. It perfectly tracks users' IP addresses using Redis.
+    </p>
+
+    <pre>
+# pip install slowapi
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from fastapi import FastAPI, Request
+
+# Create a limiter tracking the user's IP Address
+limiter = Limiter(key_func=get_remote_address)
+app = FastAPI()
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# Only allow exactly 5 hits per minute!
+@app.post("/login")
+@limiter.limit("5/minute")
+async def login(request: Request):
+    return {"message": "You successfully logged in!"}
+  </pre>
+
+    <div class="plain-english-box">
+        <strong>In plain English:</strong> If a user hits the <code>/login</code> route 6 times in 60 seconds, SlowAPI
+        automatically acts like a nightclub bouncer, cutting off their connection and returning a "429 Too Many
+        Requests" error. No database connection is ever made!
+    </div>
+
+    <h4>9. Input Size Limits (Body Size)</h4>
+    <p>If we have an endpoint that accepts a massive string of JSON, a hacker could maliciously send a 50GB JSON file,
+        causing our entire server's RAM to explode instantly.</p>
+    <p>We should configure our Reverse Proxy (Nginx) to aggressively reject any HTTP payload over a certain size (like
+        5MB) before that giant payload even gets close to touching our fragile Python code!</p>
+
+    <div class="footer">
+        <span>FastAPI Complete Handbook</span>
+        <span>Page 94</span>
+    </div>
+</div>
+            <div class="nav-buttons"><a href="chapter_33.html" class="nav-btn">← Previous</a><a href="chapter_35.html" class="nav-btn">Next →</a></div>
+        </main>
+    </div>
+</body>
+</html>
