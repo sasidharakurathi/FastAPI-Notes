@@ -106,31 +106,170 @@ def build_hub():
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
     <title>Developer Handbooks Hub</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #0a0a0a; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        h1 { font-size: 3rem; margin-bottom: 50px; color: #0db7ed; }
-        .grid { display: flex; gap: 30px; }
-        .card { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 40px; width: 300px; text-align: center; text-decoration: none; color: #fff; transition: transform 0.2s, border-color 0.2s; }
-        .card:hover { transform: translateY(-5px); }
-        .fastapi:hover { border-color: #009688; box-shadow: 0 10px 20px rgba(0, 150, 136, 0.2); }
-        .docker:hover { border-color: #0db7ed; box-shadow: 0 10px 20px rgba(13, 183, 237, 0.2); }
-        h2 { margin: 0 0 15px 0; }
-        p { color: #aaa; line-height: 1.5; }
+        :root {
+            --ink: #0f172a;
+            --paper: #f8fafc;
+            --teal: #0f766e;
+            --blue: #0369a1;
+            --muted: #475569;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Sora", "Segoe UI", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 8% 10%, rgba(15, 118, 110, 0.22), transparent 38%),
+                radial-gradient(circle at 92% 90%, rgba(3, 105, 161, 0.24), transparent 42%),
+                linear-gradient(165deg, #f6fffd 0%, #eef7ff 48%, #f8fafc 100%);
+            display: grid;
+            place-items: center;
+            padding: 24px;
+        }
+
+        .shell {
+            width: min(1040px, 100%);
+            border-radius: 28px;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(6px);
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.13);
+            padding: 44px 38px;
+            animation: rise 420ms ease-out both;
+        }
+
+        .eyebrow {
+            margin: 0 0 10px 0;
+            font-family: "IBM Plex Mono", monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--blue);
+            font-size: 12px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(2rem, 3.8vw, 3.4rem);
+            line-height: 1.12;
+            max-width: 14ch;
+        }
+
+        .lead {
+            margin: 14px 0 34px 0;
+            color: var(--muted);
+            max-width: 60ch;
+            line-height: 1.6;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .card {
+            text-decoration: none;
+            color: var(--ink);
+            background: var(--paper);
+            border: 1px solid rgba(15, 23, 42, 0.1);
+            border-radius: 20px;
+            padding: 24px;
+            min-height: 208px;
+            display: grid;
+            align-content: space-between;
+            transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 14px 36px rgba(15, 23, 42, 0.12);
+        }
+
+        .fastapi:hover {
+            border-color: rgba(15, 118, 110, 0.45);
+        }
+
+        .docker:hover {
+            border-color: rgba(3, 105, 161, 0.45);
+        }
+
+        .chip {
+            width: fit-content;
+            border-radius: 999px;
+            padding: 6px 10px;
+            font-size: 11px;
+            font-family: "IBM Plex Mono", monospace;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .chip.fastapi { background: rgba(15, 118, 110, 0.12); color: var(--teal); }
+        .chip.docker { background: rgba(3, 105, 161, 0.12); color: var(--blue); }
+
+        h2 {
+            margin: 14px 0 10px;
+            font-size: 1.25rem;
+        }
+
+        p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.55;
+        }
+
+        .cta {
+            margin-top: 16px;
+            font-family: "IBM Plex Mono", monospace;
+            font-size: 0.83rem;
+            color: #0b253e;
+        }
+
+        @media (max-width: 820px) {
+            .shell { padding: 30px 22px; border-radius: 22px; }
+            .grid { grid-template-columns: 1fr; }
+            .card { min-height: 170px; }
+        }
+
+        @keyframes rise {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
-    <h1>Developer Handbook Hub</h1>
-    <div class="grid">
-        <a href="/fastapi/" class="card fastapi">
-            <h2 style="color: #009688;">FastAPI Notes</h2>
-            <p>Everything you need to build, scale, and secure FastAPI backends natively.</p>
-        </a>
-        <a href="/docker/" class="card docker">
-            <h2 style="color: #0db7ed;">Docker Notes</h2>
-            <p>The definitive cheat-sheet-meets-deep-dive that developers keep open.</p>
-        </a>
-    </div>
+    <main class="shell">
+        <p class="eyebrow">Developer Library</p>
+        <h1>Choose your handbook and start learning fast.</h1>
+        <p class="lead">Structured notes with practical examples and chapter-level navigation for backend and platform engineering topics.</p>
+
+        <div class="grid">
+            <a href="/fastapi/" class="card fastapi">
+                <div>
+                    <span class="chip fastapi">Backend</span>
+                    <h2>FastAPI Notes</h2>
+                    <p>Build, validate, document, and deploy production-grade APIs from first endpoint to advanced patterns.</p>
+                </div>
+                <p class="cta">Open handbook -></p>
+            </a>
+
+            <a href="/docker/" class="card docker">
+                <div>
+                    <span class="chip docker">Platform</span>
+                    <h2>Docker Notes</h2>
+                    <p>Container fundamentals and workflows for local development, image design, and practical deployment habits.</p>
+                </div>
+                <p class="cta">Open handbook -></p>
+            </a>
+        </div>
+    </main>
 </body>
 </html>"""
     with open(os.path.join("dist", "index.html"), "w", encoding="utf-8") as f:

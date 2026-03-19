@@ -2,5 +2,15 @@
   "buildCommand": "python build.py",
   "outputDirectory": "dist",
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/chapter_:slug",
+      "destination": "/fastapi/chapter_:slug"
+    },
+    {
+      "source": "/chapter_:slug.html",
+      "destination": "/fastapi/chapter_:slug"
+    }
+  ]
 }
