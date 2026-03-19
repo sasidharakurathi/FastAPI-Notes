@@ -1,11 +1,12 @@
 <div class="page" id="chapter-08">
-    <div class="header">CHAPTER 8 — Docker Networking</div>
+    <div class="header">CHAPTER 8 - Docker Networking</div>
 
-    <h2 style="margin-top: 0;">CHAPTER 8 — Docker Networking</h2>
+    <h2 style="margin-top: 0;">CHAPTER 8 - Docker Networking</h2>
 
     <h3>The Default Networks</h3>
     <p>When we install Docker, it automatically creates three default virtual networks. We can see them by running
-        <code>docker network ls</code>.</p>
+        <code>docker network ls</code>.
+    </p>
 
     <table class="reference-table">
         <tr>
@@ -51,7 +52,7 @@
 
 <!-- Chapter 8 Page 2 -->
 <div class="page">
-    <div class="header">CHAPTER 8 — Docker Networking</div>
+    <div class="header">CHAPTER 8 - Docker Networking</div>
 
     <h3>Container-to-Container Communication (Internal DNS)</h3>
     <p>If we want our Python backend to talk to our PostgreSQL database, we could try logging into the database
@@ -60,7 +61,8 @@
 
     <p>Instead, Docker provides a magical internal <strong>DNS Resolver</strong>. If we put two containers on the
         <em>same custom network</em>, Docker allows them to talk to each other using their container names as pure
-        hostnames.</p>
+        hostnames.
+    </p>
 
     <h4>Real Example: Python Talking to Postgres</h4>
     <p>Let's create a custom network and attach two containers so they can talk securely behind the scenes.</p>
@@ -90,7 +92,7 @@ DATABASE_URL="postgresql://postgres:secret@db:5432/postgres"</code></pre>
 
 <!-- Chapter 8 Page 3 -->
 <div class="page">
-    <div class="header">CHAPTER 8 — Docker Networking</div>
+    <div class="header">CHAPTER 8 - Docker Networking</div>
 
     <h3>Publishing vs. Internal Networking (-p Flags)</h3>
     <p>One of the biggest mistakes beginners make is thinking they must use <code>-p 5432:5432</code> on their database
@@ -129,7 +131,8 @@ DATABASE_URL="postgresql://postgres:secret@db:5432/postgres"</code></pre>
     </table>
 
     <p>If we are developing on a Mac or Windows machine, we must rely on <code>-p</code> port forwarding. We save
-        <code>--network host</code> strictly for production Linux deployments.</p>
+        <code>--network host</code> strictly for production Linux deployments.
+    </p>
 
     <div class="footer">
         <span>Docker Complete Handbook</span>

@@ -1,7 +1,7 @@
 <div class="page" id="chapter-12">
-    <div class="header">CHAPTER 12 — Docker in CI/CD</div>
+    <div class="header">CHAPTER 12 - Docker in CI/CD</div>
 
-    <h2 style="margin-top: 0;">CHAPTER 12 — Docker in CI/CD</h2>
+    <h2 style="margin-top: 0;">CHAPTER 12 - Docker in CI/CD</h2>
 
     <h3>Why Docker in CI? (Reproducibility)</h3>
     <p>Continuous Integration (CI) servers execute our automated tests. If our tests rely on the CI server having
@@ -32,7 +32,7 @@
 
 <!-- Chapter 12 Page 2 -->
 <div class="page">
-    <div class="header">CHAPTER 12 — Docker in CI/CD</div>
+    <div class="header">CHAPTER 12 - Docker in CI/CD</div>
 
     <h3>GitHub Actions: Caching Layers</h3>
     <p>GitHub Actions runners boot up completely fresh and naked every single time. This means we instantly lose all of
@@ -71,7 +71,7 @@ steps:
 
 <!-- Chapter 12 Page 3 -->
 <div class="page">
-    <div class="header">CHAPTER 12 — Docker in CI/CD</div>
+    <div class="header">CHAPTER 12 - Docker in CI/CD</div>
 
     <h3>GitLab CI: DinD vs Socket Mounting</h3>
     <p>If we use GitLab CI, the CI runner itself is natively executing <em>inside</em> a Docker container. This creates
@@ -93,7 +93,8 @@ steps:
         <tr>
             <td><strong>Docker-in-Docker (DinD)</strong></td>
             <td>We run an entire isolated, nested Docker Daemon runtime literally inside the CI container. (The
-                <code>docker:dind</code> secondary service).</td>
+                <code>docker:dind</code> secondary service).
+            </td>
             <td><strong>Pro:</strong> Highly secure isolation.<br><strong>Con:</strong> Slower. Destroys layer caching
                 because the nested daemon shuts down permanently after the pipeline finishes.</td>
         </tr>
@@ -118,7 +119,7 @@ test_job:
 
 <!-- Chapter 12 Page 4 -->
 <div class="page">
-    <div class="header">CHAPTER 12 — Docker in CI/CD</div>
+    <div class="header">CHAPTER 12 - Docker in CI/CD</div>
 
     <h3>Integration Testing with Compose</h3>
     <p>Unit tests are great, but what if our code requires an actual working PostgreSQL database and Redis cluster to

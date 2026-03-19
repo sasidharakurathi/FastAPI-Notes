@@ -1,7 +1,7 @@
 <div class="page" id="chapter-13">
-    <div class="header">CHAPTER 13 — Performance, Size & Security</div>
+    <div class="header">CHAPTER 13 - Performance, Size & Security</div>
 
-    <h2 style="margin-top: 0;">CHAPTER 13 — Performance, Size & Security</h2>
+    <h2 style="margin-top: 0;">CHAPTER 13 - Performance, Size & Security</h2>
 
     <h3>Choosing the Right Base Image</h3>
     <p>The foundation of every container is its base image. Choosing the wrong base image is the #1 cause of slow
@@ -57,7 +57,7 @@
 
 <!-- Chapter 13 Page 2 -->
 <div class="page">
-    <div class="header">CHAPTER 13 — Performance, Size & Security</div>
+    <div class="header">CHAPTER 13 - Performance, Size & Security</div>
 
     <h3>The <code>USER</code> Instruction (Non-Root Magic)</h3>
     <p>By default, the process running inside every Docker container executes as the <code>root</code> user (User ID 0).
@@ -89,7 +89,8 @@ CMD ["npm", "start"]</code></pre>
     </div>
 
     <p>If our app dynamically needs to write files (like uploading avatars), we explicitly map a specific
-        <code>tmpfs</code> or Named Volume strictly just for that directory.</p>
+        <code>tmpfs</code> or Named Volume strictly just for that directory.
+    </p>
 
     <div class="footer">
         <span>Docker Complete Handbook</span>
@@ -99,7 +100,7 @@ CMD ["npm", "start"]</code></pre>
 
 <!-- Chapter 13 Page 3 -->
 <div class="page">
-    <div class="header">CHAPTER 13 — Performance, Size & Security</div>
+    <div class="header">CHAPTER 13 - Performance, Size & Security</div>
 
     <h3>Vulnerability Scanning (Docker Scout)</h3>
     <p>We should never blindly trust public images. Vulnerabilities (CVEs) are discovered constantly. Docker provides a
@@ -131,7 +132,7 @@ docker scout cves my-app:latest</code></pre>
 
 <!-- Chapter 13 Page 4 -->
 <div class="page">
-    <div class="header">CHAPTER 13 — Performance, Size & Security</div>
+    <div class="header">CHAPTER 13 - Performance, Size & Security</div>
 
     <h3>Imposing Resource Limits</h3>
     <p>A single buggy Docker container caught in an infinite `while(true)` loop can accidentally consume 100% of our

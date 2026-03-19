@@ -1,7 +1,7 @@
 <div class="page" id="chapter-15">
-    <div class="header">CHAPTER 15 — Quick Reference</div>
+    <div class="header">CHAPTER 15 - Quick Reference</div>
 
-    <h2 style="margin-top: 0;">CHAPTER 15 — Quick Reference & Cheat Sheet</h2>
+    <h2 style="margin-top: 0;">CHAPTER 15 - Quick Reference & Cheat Sheet</h2>
 
     <h3>Essential Docker CLI Commands</h3>
     <table class="reference-table">
@@ -51,7 +51,7 @@
 
 <!-- Chapter 15 Page 2 -->
 <div class="page">
-    <div class="header">CHAPTER 15 — Quick Reference</div>
+    <div class="header">CHAPTER 15 - Quick Reference</div>
 
     <h3>Dockerfile Instruction Cheat Sheet</h3>
     <table class="reference-table">
@@ -108,13 +108,14 @@
 
 <!-- Chapter 15 Page 3 -->
 <div class="page">
-    <div class="header">CHAPTER 15 — Quick Reference</div>
+    <div class="header">CHAPTER 15 - Quick Reference</div>
 
     <h3>Debugging Common Errors</h3>
 
     <h4>1. "bind: address already in use"</h4>
     <p><strong>The Error:</strong> Something on our laptop is already using the port we tried to publish via
-        <code>-p 8080:8000</code>.</p>
+        <code>-p 8080:8000</code>.
+    </p>
     <p><strong>The Fix:</strong> We either stop the rogue local service (maybe another container is still running), or
         simply change our host port parameter to <code>-p 8081:8000</code>.</p>
 
@@ -134,7 +135,8 @@
     <p><strong>The Error:</strong> We told Docker Compose to boot `image: my-app`, but we haven't actually built it yet,
         and Docker Hub definitely doesn't host our private app.</p>
     <p><strong>The Fix:</strong> We must explicitly run <code>docker compose build</code>, OR we must add a
-        <code>build: .</code> block underneath the `image:` block so Compose knows how to build it automatically.</p>
+        <code>build: .</code> block underneath the `image:` block so Compose knows how to build it automatically.
+    </p>
 
     <div class="footer">
         <span>Docker Complete Handbook</span>
@@ -144,14 +146,15 @@
 
 <!-- Chapter 15 Page 4 -->
 <div class="page">
-    <div class="header">CHAPTER 15 — Quick Reference</div>
+    <div class="header">CHAPTER 15 - Quick Reference</div>
 
     <h4>5. "network not found"</h4>
     <p><strong>The Error:</strong> We ran `docker run --network my_net`, but Docker throws a fatal error because the
         custom network doesn't physically exist.</p>
     <p><strong>The Fix:</strong> When running independent containers, we must manually run
         <code>docker network create my_net</code> first. (Remember, Docker Compose handles this automatically, but plain
-        `docker run` does not).</p>
+        `docker run` does not).
+    </p>
 
     <h3>The Ultimate System Cleanup</h3>
     <p>Over months of development, Docker endlessly hoards old images, dangling build caches, stopped containers, and

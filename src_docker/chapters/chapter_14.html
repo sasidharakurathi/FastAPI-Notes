@@ -1,7 +1,7 @@
 <div class="page" id="chapter-14">
-    <div class="header">CHAPTER 14 — Useful Patterns</div>
+    <div class="header">CHAPTER 14 - Useful Patterns</div>
 
-    <h2 style="margin-top: 0;">CHAPTER 14 — Useful Patterns & Real-World Recipes</h2>
+    <h2 style="margin-top: 0;">CHAPTER 14 - Useful Patterns & Real-World Recipes</h2>
 
     <h3>The Sidecar Pattern</h3>
     <p>Sometimes our main application needs a helper. A "Sidecar" is a secondary container deployed right next to our
@@ -45,11 +45,11 @@
 
 <!-- Chapter 14 Page 2 -->
 <div class="page">
-    <div class="header">CHAPTER 14 — Useful Patterns</div>
+    <div class="header">CHAPTER 14 - Useful Patterns</div>
 
     <h3>One-off Task Containers</h3>
-    <p>We often need to run a temporary script—like downloading a specific file, parsing a JSON, or generating a quick
-        RSA key—but we absolutely do not want to pollute our laptop with global node modules or curl configurations.</p>
+    <p>We often need to run a temporary script-like downloading a specific file, parsing a JSON, or generating a quick
+        RSA key-but we absolutely do not want to pollute our laptop with global node modules or curl configurations.</p>
 
     <div class="usage-box">
         <code>docker run --rm alpine sed...</code><br>
@@ -92,7 +92,7 @@ docker run --rm alpine sh -c "apk add openssl && openssl rand -hex 32"</code></p
 
 <!-- Chapter 14 Page 3 -->
 <div class="page">
-    <div class="header">CHAPTER 14 — Useful Patterns</div>
+    <div class="header">CHAPTER 14 - Useful Patterns</div>
 
     <h3>Cron Job Containers</h3>
     <p>If we want to run a script every 5 minutes (like cleaning up old sessions or scraping an API), we don't need a
@@ -108,7 +108,8 @@ services:
     <h3>Health Checks in Production</h3>
     <p>Docker naturally assumes a container is "Healthy" as long as the process hasn't crashed. But what if our Node app
         is stuck in a deadlocked While Loop? The process is running, but our users see infinite timeouts. We must use a
-        <code>HEALTHCHECK</code>.</p>
+        <code>HEALTHCHECK</code>.
+    </p>
 
     <pre><code>FROM python:3.11-slim
 # ... setup app ...
@@ -135,7 +136,7 @@ CMD ["uvicorn", "main:app"]</code></pre>
 
 <!-- Chapter 14 Page 4 -->
 <div class="page">
-    <div class="header">CHAPTER 14 — Useful Patterns</div>
+    <div class="header">CHAPTER 14 - Useful Patterns</div>
 
     <h3>Container Auto-Restart Policies</h3>
     <p>If our Node server suddenly crashes due to a massive memory spike, what happens? By default, the container dies
@@ -156,7 +157,8 @@ CMD ["uvicorn", "main:app"]</code></pre>
             <td><code>always</code></td>
             <td>If it crashes, Docker aggressively restarts it. If we restart the host physical server, Docker instantly
                 reboots the container on startup. Only way to permanently stop it is by explicitly running
-                <code>docker stop</code>.</td>
+                <code>docker stop</code>.
+            </td>
         </tr>
         <tr>
             <td><code>unless-stopped</code></td>

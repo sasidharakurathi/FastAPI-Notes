@@ -1,12 +1,13 @@
 <div class="page" id="chapter-10">
-    <div class="header">CHAPTER 10 — Development Workflow</div>
+    <div class="header">CHAPTER 10 - Development Workflow</div>
 
-    <h2 style="margin-top: 0;">CHAPTER 10 — Development Workflow with Docker</h2>
+    <h2 style="margin-top: 0;">CHAPTER 10 - Development Workflow with Docker</h2>
 
     <h3>The Right Mental Model</h3>
     <p>Using Docker in production is easy: Build an image, run the container. But using Docker for everyday local
         development confuses many developers. "Do I have to rebuild my image every time I save a file?" The answer is
-        <strong>absolutely not</strong>.</p>
+        <strong>absolutely not</strong>.
+    </p>
     <p>Our local dev mental model is this: <strong>The container provides the raw runtime environment (Python, Node,
             libraries). Our laptop provides the source code.</strong> We glue them together using Bind Mounts.</p>
 
@@ -37,7 +38,7 @@ services:
 
 <!-- Chapter 10 Page 2 -->
 <div class="page">
-    <div class="header">CHAPTER 10 — Development Workflow</div>
+    <div class="header">CHAPTER 10 - Development Workflow</div>
 
     <h3>Targeting Dev vs. Prod Stages</h3>
     <p>If our workflow requires development linters, testing suites, or hot-reload utilities, we should NOT bake those
@@ -74,7 +75,8 @@ services:
     <p>We never hardcode secrets (like AWS keys) in our Dockerfiles. Locally, we create a raw text file named
         <code>.env</code> in our project root containing our passwords. We then hook this file into our Compose setup
         using the <code>env_file:</code> directive. We must <strong>always</strong> add `.env` to our `.gitignore`
-        immediately, otherwise we might automatically publish our secure database credentials to GitHub!</p>
+        immediately, otherwise we might automatically publish our secure database credentials to GitHub!
+    </p>
 
     <div class="footer">
         <span>Docker Complete Handbook</span>
@@ -84,7 +86,7 @@ services:
 
 <!-- Chapter 10 Page 3 -->
 <div class="page">
-    <div class="header">CHAPTER 10 — Development Workflow</div>
+    <div class="header">CHAPTER 10 - Development Workflow</div>
 
     <h3>Debugging & Logs</h3>
     <p>When things break, we don't SSH into containers like they are virtual machines. We use native Docker
@@ -101,7 +103,8 @@ services:
 
     <h3>VS Code Dev Containers</h3>
     <p>If our entire team uses VS Code, we can eliminate the "Works on my machine" problem entirely by developing
-        <em>directly inside a container</em>. </p>
+        <em>directly inside a container</em>.
+    </p>
 
     <p>Instead of mapping files from our laptop to the container, the <strong>Dev Containers</strong> extension
         literally injects genuine VS Code language servers, linters, and debuggers directly into a running Docker
@@ -124,7 +127,7 @@ services:
 
 <!-- Chapter 10 Page 4 -->
 <div class="page">
-    <div class="header">CHAPTER 10 — Development Workflow</div>
+    <div class="header">CHAPTER 10 - Development Workflow</div>
 
     <h3>Makefile Shortcut Patterns</h3>
     <p>Typing out massive Compose commands all day is tedious. A true Senior Developer creates a <code>Makefile</code>

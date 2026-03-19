@@ -1,75 +1,75 @@
 <div class="page" id="chapter-09">
-    <div class="header">CHAPTER 9 — Docker Compose</div>
+  <div class="header">CHAPTER 9 - Docker Compose</div>
 
-    <h2 style="margin-top: 0;">CHAPTER 9 — Docker Compose (Multi-Container Apps)</h2>
+  <h2 style="margin-top: 0;">CHAPTER 9 - Docker Compose (Multi-Container Apps)</h2>
 
-    <h3>What is Compose and Why Does it Exist?</h3>
-    <p>Until now, we have been using <code>docker run</code> to start a single container. But real applications are
-        rarely single containers. A modern web app might require a reverse proxy, a Python backend, a Redis cache, and a
-        PostgreSQL database.</p>
-    <p>Typing out four massive <code>docker run</code> commands with 15 flags each, manually creating virtual networks,
-        and hoping we do it in the exact right order is physically exhausting and highly error-prone.</p>
+  <h3>What is Compose and Why Does it Exist?</h3>
+  <p>Until now, we have been using <code>docker run</code> to start a single container. But real applications are
+    rarely single containers. A modern web app might require a reverse proxy, a Python backend, a Redis cache, and a
+    PostgreSQL database.</p>
+  <p>Typing out four massive <code>docker run</code> commands with 15 flags each, manually creating virtual networks,
+    and hoping we do it in the exact right order is physically exhausting and highly error-prone.</p>
 
-    <div class="plain-english-box">
-        <strong>Enter Docker Compose:</strong><br>
-        Compose is an IaC (Infrastructure as Code) tool. Instead of typing commands into the terminal, we write down our
-        entire architectural layout in a single, human-readable YAML file called <code>docker-compose.yml</code>. Docker
-        reads this file and magically spins up the networks, volumes, and containers in one shot.
-    </div>
+  <div class="plain-english-box">
+    <strong>Enter Docker Compose:</strong><br>
+    Compose is an IaC (Infrastructure as Code) tool. Instead of typing commands into the terminal, we write down our
+    entire architectural layout in a single, human-readable YAML file called <code>docker-compose.yml</code>. Docker
+    reads this file and magically spins up the networks, volumes, and containers in one shot.
+  </div>
 
-    <h3>The <code>docker-compose.yml</code> Structure</h3>
-    <p>A Compose file is strictly divided into top-level blocks:</p>
-    <ul>
-        <li><code>services:</code> The actual containers we want to run (e.g., `web`, `db`).</li>
-        <li><code>volumes:</code> The named volumes we want Docker to create and manage.</li>
-        <li><code>networks:</code> The custom virtual networks our containers will communicate across.</li>
-    </ul>
+  <h3>The <code>docker-compose.yml</code> Structure</h3>
+  <p>A Compose file is strictly divided into top-level blocks:</p>
+  <ul>
+    <li><code>services:</code> The actual containers we want to run (e.g., `web`, `db`).</li>
+    <li><code>volumes:</code> The named volumes we want Docker to create and manage.</li>
+    <li><code>networks:</code> The custom virtual networks our containers will communicate across.</li>
+  </ul>
 
-    <h3>The Everyday Compose Commands</h3>
-    <table class="reference-table">
-        <tr>
-            <th>Command</th>
-            <th>What it does</th>
-        </tr>
-        <tr>
-            <td><code>docker compose up -d</code></td>
-            <td>Reads the YAML, builds missing images, creates networks, and boots the entire stack in the background.
-            </td>
-        </tr>
-        <tr>
-            <td><code>docker compose down -v</code></td>
-            <td>Stops every container in the stack, deletes them, and deletes the custom networks. The <code>-v</code>
-                flag completely wipes the attached volumes (useful for nuking the dev database).</td>
-        </tr>
-        <tr>
-            <td><code>docker compose build</code></td>
-            <td>Forces Docker to re-read our Dockerfiles and rebuild the custom images without starting the stack.</td>
-        </tr>
-        <tr>
-            <td><code>docker compose logs -f</code></td>
-            <td>Streams the combined stdout logs of <em>all</em> containers in the stack simultaneously.</td>
-        </tr>
-        <tr>
-            <td><code>docker compose exec db bash</code></td>
-            <td>Drops us into an interactive bash shell inside the specific service named `db`.</td>
-        </tr>
-    </table>
+  <h3>The Everyday Compose Commands</h3>
+  <table class="reference-table">
+    <tr>
+      <th>Command</th>
+      <th>What it does</th>
+    </tr>
+    <tr>
+      <td><code>docker compose up -d</code></td>
+      <td>Reads the YAML, builds missing images, creates networks, and boots the entire stack in the background.
+      </td>
+    </tr>
+    <tr>
+      <td><code>docker compose down -v</code></td>
+      <td>Stops every container in the stack, deletes them, and deletes the custom networks. The <code>-v</code>
+        flag completely wipes the attached volumes (useful for nuking the dev database).</td>
+    </tr>
+    <tr>
+      <td><code>docker compose build</code></td>
+      <td>Forces Docker to re-read our Dockerfiles and rebuild the custom images without starting the stack.</td>
+    </tr>
+    <tr>
+      <td><code>docker compose logs -f</code></td>
+      <td>Streams the combined stdout logs of <em>all</em> containers in the stack simultaneously.</td>
+    </tr>
+    <tr>
+      <td><code>docker compose exec db bash</code></td>
+      <td>Drops us into an interactive bash shell inside the specific service named `db`.</td>
+    </tr>
+  </table>
 
-    <div class="footer">
-        <span>Docker Complete Handbook</span>
-        <span>Page 23</span>
-    </div>
+  <div class="footer">
+    <span>Docker Complete Handbook</span>
+    <span>Page 23</span>
+  </div>
 </div>
 
 <!-- Chapter 9 Page 2 -->
 <div class="page">
-    <div class="header">CHAPTER 9 — Docker Compose</div>
+  <div class="header">CHAPTER 9 - Docker Compose</div>
 
-    <h3>Real Example 1: Full Stack Python App</h3>
-    <p>Let's map out a complex, real-world application. We have a FastAPI backend, a Postgres database, a Redis cache,
-        and an Nginx reverse proxy.</p>
+  <h3>Real Example 1: Full Stack Python App</h3>
+  <p>Let's map out a complex, real-world application. We have a FastAPI backend, a Postgres database, a Redis cache,
+    and an Nginx reverse proxy.</p>
 
-    <pre><code># docker-compose.yml
+  <pre><code># docker-compose.yml
 services:
   db:
     image: postgres:15-alpine
@@ -108,28 +108,28 @@ services:
 volumes:
   pg_data: # Declares the named volume so Compose creates it</code></pre>
 
-    <div class="mistake-box">
-        <strong>⚠️ Automatic Networking Magic:</strong><br>
-        Notice that we never declared a <code>networks:</code> block in that file. That is because Docker Compose
-        automatically creates a dedicated bridge network for the stack, and permanently attaches every service to it.
-        They can instantly talk to each other using their service names (`db`, `redis`, `api`).
-    </div>
+  <div class="mistake-box">
+    <strong>⚠️ Automatic Networking Magic:</strong><br>
+    Notice that we never declared a <code>networks:</code> block in that file. That is because Docker Compose
+    automatically creates a dedicated bridge network for the stack, and permanently attaches every service to it.
+    They can instantly talk to each other using their service names (`db`, `redis`, `api`).
+  </div>
 
-    <div class="footer">
-        <span>Docker Complete Handbook</span>
-        <span>Page 24</span>
-    </div>
+  <div class="footer">
+    <span>Docker Complete Handbook</span>
+    <span>Page 24</span>
+  </div>
 </div>
 
 <!-- Chapter 9 Page 3 -->
 <div class="page">
-    <div class="header">CHAPTER 9 — Docker Compose</div>
+  <div class="header">CHAPTER 9 - Docker Compose</div>
 
-    <h3>Real Example 2: Node.js + MongoDB</h3>
-    <p>Let's look at another stack. If we are developing a Node application, we might want to map our laptop's folder
-        directly into the container for live reloading.</p>
+  <h3>Real Example 2: Node.js + MongoDB</h3>
+  <p>Let's look at another stack. If we are developing a Node application, we might want to map our laptop's folder
+    directly into the container for live reloading.</p>
 
-    <pre><code>services:
+  <pre><code>services:
   mongo:
     image: mongo:6
     volumes:
@@ -152,59 +152,60 @@ volumes:
 volumes:
   mongo_data:</code></pre>
 
-    <h3>Environment Variable Management</h3>
-    <p>Writing highly sensitive passwords directly in a <code>docker-compose.yml</code> file is a massive security
-        failure. If we commit that to Git, our servers will absolutely get hacked.</p>
+  <h3>Environment Variable Management</h3>
+  <p>Writing highly sensitive passwords directly in a <code>docker-compose.yml</code> file is a massive security
+    failure. If we commit that to Git, our servers will absolutely get hacked.</p>
 
-    <p>Instead, we use <code>.env</code> files. Docker Compose automatically searches for a `.env` file in the same
-        directory as the `docker-compose.yml`. We can dynamically inject those secrets in two ways:</p>
-    <ol>
-        <li><strong>Variable Substitution:</strong> We write <code>${MY_SECRET}</code> directly in the YAML file (like
-            we did with Postgres).</li>
-        <li><strong>The <code>env_file</code> Key:</strong> We pass the entire `.env` file wholesale straight into the
-            container environment (like we did with our Node app).</li>
-    </ol>
+  <p>Instead, we use <code>.env</code> files. Docker Compose automatically searches for a `.env` file in the same
+    directory as the `docker-compose.yml`. We can dynamically inject those secrets in two ways:</p>
+  <ol>
+    <li><strong>Variable Substitution:</strong> We write <code>${MY_SECRET}</code> directly in the YAML file (like
+      we did with Postgres).</li>
+    <li><strong>The <code>env_file</code> Key:</strong> We pass the entire `.env` file wholesale straight into the
+      container environment (like we did with our Node app).</li>
+  </ol>
 
-    <div class="footer">
-        <span>Docker Complete Handbook</span>
-        <span>Page 25</span>
-    </div>
+  <div class="footer">
+    <span>Docker Complete Handbook</span>
+    <span>Page 25</span>
+  </div>
 </div>
 
 <!-- Chapter 9 Page 4 -->
 <div class="page">
-    <div class="header">CHAPTER 9 — Docker Compose</div>
+  <div class="header">CHAPTER 9 - Docker Compose</div>
 
-    <h3>Advanced: Override Files (Dev vs. Prod)</h3>
-    <p>Our infrastructure behaves differently on our laptop than it does in production. We don't want two completely
-        separate Compose files, because they will quickly drift out of sync.</p>
+  <h3>Advanced: Override Files (Dev vs. Prod)</h3>
+  <p>Our infrastructure behaves differently on our laptop than it does in production. We don't want two completely
+    separate Compose files, because they will quickly drift out of sync.</p>
 
-    <p>Docker naturally supports <strong>Override Files</strong>. If we have a file named
-        <code>docker-compose.override.yml</code>, Docker heavily merges it with the base <code>docker-compose.yml</code>
-        file when we type `docker compose up`.</p>
-    <ul>
-        <li><strong>Base (`docker-compose.yml`):</strong> Holds the generic setup (images, basic networks). Committed to
-            Git.</li>
-        <li><strong>Override (`docker-compose.override.yml`):</strong> Contains our local dev overrides (massive bind
-            mounts for live reloading, exposing internal database ports to our laptop for debugging). <em>We add this to
-                .gitignore!</em></li>
-    </ul>
+  <p>Docker naturally supports <strong>Override Files</strong>. If we have a file named
+    <code>docker-compose.override.yml</code>, Docker heavily merges it with the base <code>docker-compose.yml</code>
+    file when we type `docker compose up`.
+  </p>
+  <ul>
+    <li><strong>Base (`docker-compose.yml`):</strong> Holds the generic setup (images, basic networks). Committed to
+      Git.</li>
+    <li><strong>Override (`docker-compose.override.yml`):</strong> Contains our local dev overrides (massive bind
+      mounts for live reloading, exposing internal database ports to our laptop for debugging). <em>We add this to
+        .gitignore!</em></li>
+  </ul>
 
-    <h3>The <code>depends_on</code> Startup Illusion</h3>
-    <p>The <code>depends_on</code> field tells Compose to start the Database before it starts the Python API.</p>
+  <h3>The <code>depends_on</code> Startup Illusion</h3>
+  <p>The <code>depends_on</code> field tells Compose to start the Database before it starts the Python API.</p>
 
-    <div class="plain-english-box">
-        <strong>The Startup Paradox:</strong><br>
-        <code>depends_on</code> solely guarantees that Compose will <em>send the start command</em> to the DB container
-        first. However, a database might take 15 seconds to allocate memory and accept connections. Compose does NOT
-        wait. It immediately starts the Python API right after, which promptly crashes because the DB is booting but not
-        actually listening yet.
-    </div>
+  <div class="plain-english-box">
+    <strong>The Startup Paradox:</strong><br>
+    <code>depends_on</code> solely guarantees that Compose will <em>send the start command</em> to the DB container
+    first. However, a database might take 15 seconds to allocate memory and accept connections. Compose does NOT
+    wait. It immediately starts the Python API right after, which promptly crashes because the DB is booting but not
+    actually listening yet.
+  </div>
 
-    <p>We solve this tightly coupling using actual <strong>Healthchecks</strong>. We can define exactly how to test if
-        the DB is ready, and explicitly tell our API to wait for that passing grade.</p>
+  <p>We solve this tightly coupling using actual <strong>Healthchecks</strong>. We can define exactly how to test if
+    the DB is ready, and explicitly tell our API to wait for that passing grade.</p>
 
-    <pre><code>services:
+  <pre><code>services:
   db:
     image: postgres:15
     healthcheck:
@@ -218,8 +219,8 @@ volumes:
       db:
         condition: service_healthy # The API will pause and wait!</code></pre>
 
-    <div class="footer">
-        <span>Docker Complete Handbook</span>
-        <span>Page 26</span>
-    </div>
+  <div class="footer">
+    <span>Docker Complete Handbook</span>
+    <span>Page 26</span>
+  </div>
 </div>

@@ -1,99 +1,127 @@
 <!-- Table of Contents Page -->
 <div class="page">
-    <div class="header">Table of Contents</div>
-    <h2 style="margin-top: 0;">Table of Contents</h2>
-    <ul class="toc-list" id="toc">
-        <li class="toc-section">PART I — FUNDAMENTALS</li>
-        <li><button type="button" class="toc-link" data-target="#chapter-1">CHAPTER 1 - What is FastAPI and Why Should
-                You Care?</button> <span class="page-num">3</span></li>
-        <li><button type="button" class="toc-link" data-target="#chapter-2">CHAPTER 2 - Setting Up Our First FastAPI
-                App</button> <span class="page-num">5</span></li>
-        <li><button type="button" class="toc-link" data-target="#chapter-3">CHAPTER 3 - Path Operations (The Building
-                Blocks)</button> <span class="page-num">7</span>
-        </li>
-        <li><button type="button" class="toc-link" data-target="#chapter-4">CHAPTER 4 - Path Parameters</button> <span
-                class="page-num">10</span></li>
-        <li><button type="button" class="toc-link" data-target="#chapter-5">CHAPTER 5 - Query Parameters</button> <span
-                class="page-num">13</span></li>
-        <li class="toc-section">PART II — DATA HANDLING</li>
-        <li><button type="button" class="toc-link" data-target="#chapter-6">CHAPTER 6 - Request Bodies</button> <span
-                class="page-num">16</span></li>
-        <li><button type="button" class="toc-link" data-target="#chapter-7">CHAPTER 7 - Body Fields & Nested
-                Models</button> <span class="page-num">19</span></li>
-        <li><button type="button" class="toc-link" data-target="#chapter-8">CHAPTER 8 - Request Examples & Schema
-                Configuration</button> <span class="page-num">22</span></li>
-        <li><button type="button" class="toc-link" data-target="#chapter-9">CHAPTER 9 - Extra Data Types</button> <span
-                class="page-num">25</span></li>
-        <li><button type="button" class="toc-link" data-target="#chapter-10">CHAPTER 10 - Cookie Parameters</button>
-            <span class="page-num">27</span></li>
-        <li><button type="button" class="toc-link" data-target="#chapter-11">CHAPTER 11 - Header Parameters</button>
-            <span class="page-num">28</span></li>
-        <li><button type="button" class="toc-link" data-target="#chapter-12">CHAPTER 12 - Response Model & Status
-                Codes</button> <span class="page-num">30</span></li>
-        <li><button type="button" class="toc-link" data-target="#chapter-13">CHAPTER 13 - Form Data</button> <span
-                class="page-num">33</span></li>
-        <li><button type="button" class="toc-link" data-target="#chapter-14">CHAPTER 14 - File Uploads</button> <span
-                class="page-num">35</span></li>
-        <li><button type="button" class="toc-link" data-target="#chapter-15">CHAPTER 15 - Handling Errors</button> <span
-                class="page-num">38</span></li>
-        <li class="toc-section">PART III — SECURITY</li>
-        <li><button type="button" class="toc-link" data-target="#chapter-16">CHAPTER 16 - Introduction to
-                Dependencies</button> <span class="page-num">41</span></li>
-        <li><button type="button" class="toc-link" data-target="#chapter-17">CHAPTER 17 - Security Overview</button>
-            <span class="page-num">43</span></li>
-        <li><button type="button" class="toc-link" data-target="#chapter-18">CHAPTER 18 - OAuth2 Password Flow
-                (Basic)</button> <span class="page-num">45</span></li>
-        <li><button type="button" class="toc-link" data-target="#chapter-19">CHAPTER 19 - JWT Authentication</button>
-            <span class="page-num">48</span></li>
-        <li class="toc-section">PART IV — APP STRUCTURE & MIDDLEWARE</li>
-        <li><button type="button" class="toc-link" data-target="#chapter-20">CHAPTER 20 - Middleware</button> <span
-                class="page-num">53</span></li>
-        <li><button type="button" class="toc-link" data-target="#chapter-21">CHAPTER 21 - CORS (Cross-Origin Resource
-                Sharing)</button> <span class="page-num">55</span>
-        </li>
-        <li><button type="button" class="toc-link" data-target="#chapter-22">CHAPTER 22 - APIRouter (Splitting Your
-                App)</button> <span class="page-num">57</span></li>
-        <li><button type="button" class="toc-link" data-target="#chapter-23">CHAPTER 23 - Bigger Applications
-                Structure</button> <span class="page-num">60</span></li>
-        <li class="toc-section">PART V — ADVANCED TOPICS</li>
-        <li><button type="button" class="toc-link" data-target="#chapter-24">CHAPTER 24 - Background Tasks</button>
-            <span class="page-num">63</span></li>
-        <li><button type="button" class="toc-link" data-target="#chapter-25">CHAPTER 25 - Static Files</button> <span
-                class="page-num">65</span></li>
-        <li><button type="button" class="toc-link" data-target="#chapter-26">CHAPTER 26 - SQL Databases</button> <span
-                class="page-num">67</span></li>
-        <li><button type="button" class="toc-link" data-target="#chapter-27">CHAPTER 27 - Custom Responses</button>
-            <span class="page-num">70</span></li>
-        <li><button type="button" class="toc-link" data-target="#chapter-28">CHAPTER 28 - WebSockets</button> <span
-                class="page-num">73</span></li>
-        <li><button type="button" class="toc-link" data-target="#chapter-29">CHAPTER 29 - Async & Concurrency Deep
-                Dive</button> <span class="page-num">77</span></li>
-        <li><button type="button" class="toc-link" data-target="#chapter-30">CHAPTER 30 - Settings &
-                Configuration</button> <span class="page-num">80</span></li>
-        <li><button type="button" class="toc-link" data-target="#chapter-31">CHAPTER 31 - Templates (Jinja2)</button>
-            <span class="page-num">83</span></li>
-        <li class="toc-section">PART VI — DEPLOYMENT</li>
-        <li><button type="button" class="toc-link" data-target="#chapter-32">CHAPTER 32 - Concepts Before
-                Deploying</button> <span class="page-num">86</span></li>
-        <li><button type="button" class="toc-link" data-target="#chapter-33">CHAPTER 33 - Docker Deployment</button>
-            <span class="page-num">89</span></li>
-        <li><button type="button" class="toc-link" data-target="#chapter-34">CHAPTER 34 - Production Checklist</button>
-            <span class="page-num">92</span></li>
-        <li class="toc-section">PART VII — REFERENCE</li>
-        <li><button type="button" class="toc-link" data-target="#chapter-35">CHAPTER 35 - FastAPI & APIRouter
-                Reference</button> <span class="page-num">95</span></li>
-        <li><button type="button" class="toc-link" data-target="#chapter-36">CHAPTER 36 - HTTP Status Codes
-                Reference</button> <span class="page-num">97</span></li>
-        <li><button type="button" class="toc-link" data-target="#chapter-37">CHAPTER 37 - Recommended Libraries
-                Ecosystem</button> <span class="page-num">100</span>
-        </li>
-        <li><button type="button" class="toc-link" data-target="#chapter-38">CHAPTER 38 - FastAPI Cheat Sheet</button>
-            <span class="page-num">102</span></li>
-        <li><button type="button" class="toc-link" data-target="#chapter-39">CHAPTER 39 - Architecture &
-                Patterns</button> <span class="page-num">105</span></li>
-    </ul>
-    <div class="footer">
-        <span>FastAPI Complete Handbook</span>
-        <span>Page 2</span>
-    </div>
+        <div class="header">Table of Contents</div>
+        <h2 style="margin-top: 0;">Table of Contents</h2>
+        <ul class="toc-list" id="toc">
+                <li class="toc-section">PART I - FUNDAMENTALS</li>
+                <li><button type="button" class="toc-link" data-target="#chapter-1">CHAPTER 1 - What is FastAPI and Why
+                                Should
+                                You Care?</button> <span class="page-num">3</span></li>
+                <li><button type="button" class="toc-link" data-target="#chapter-2">CHAPTER 2 - Setting Up Our First
+                                FastAPI
+                                App</button> <span class="page-num">5</span></li>
+                <li><button type="button" class="toc-link" data-target="#chapter-3">CHAPTER 3 - Path Operations (The
+                                Building
+                                Blocks)</button> <span class="page-num">7</span>
+                </li>
+                <li><button type="button" class="toc-link" data-target="#chapter-4">CHAPTER 4 - Path Parameters</button>
+                        <span class="page-num">10</span></li>
+                <li><button type="button" class="toc-link" data-target="#chapter-5">CHAPTER 5 - Query
+                                Parameters</button> <span class="page-num">13</span></li>
+                <li class="toc-section">PART II - DATA HANDLING</li>
+                <li><button type="button" class="toc-link" data-target="#chapter-6">CHAPTER 6 - Request Bodies</button>
+                        <span class="page-num">16</span></li>
+                <li><button type="button" class="toc-link" data-target="#chapter-7">CHAPTER 7 - Body Fields & Nested
+                                Models</button> <span class="page-num">19</span></li>
+                <li><button type="button" class="toc-link" data-target="#chapter-8">CHAPTER 8 - Request Examples &
+                                Schema
+                                Configuration</button> <span class="page-num">22</span></li>
+                <li><button type="button" class="toc-link" data-target="#chapter-9">CHAPTER 9 - Extra Data
+                                Types</button> <span class="page-num">25</span></li>
+                <li><button type="button" class="toc-link" data-target="#chapter-10">CHAPTER 10 - Cookie
+                                Parameters</button>
+                        <span class="page-num">27</span>
+                </li>
+                <li><button type="button" class="toc-link" data-target="#chapter-11">CHAPTER 11 - Header
+                                Parameters</button>
+                        <span class="page-num">28</span>
+                </li>
+                <li><button type="button" class="toc-link" data-target="#chapter-12">CHAPTER 12 - Response Model &
+                                Status
+                                Codes</button> <span class="page-num">30</span></li>
+                <li><button type="button" class="toc-link" data-target="#chapter-13">CHAPTER 13 - Form Data</button>
+                        <span class="page-num">33</span></li>
+                <li><button type="button" class="toc-link" data-target="#chapter-14">CHAPTER 14 - File Uploads</button>
+                        <span class="page-num">35</span></li>
+                <li><button type="button" class="toc-link" data-target="#chapter-15">CHAPTER 15 - Handling
+                                Errors</button> <span class="page-num">38</span></li>
+                <li class="toc-section">PART III - SECURITY</li>
+                <li><button type="button" class="toc-link" data-target="#chapter-16">CHAPTER 16 - Introduction to
+                                Dependencies</button> <span class="page-num">41</span></li>
+                <li><button type="button" class="toc-link" data-target="#chapter-17">CHAPTER 17 - Security
+                                Overview</button>
+                        <span class="page-num">43</span>
+                </li>
+                <li><button type="button" class="toc-link" data-target="#chapter-18">CHAPTER 18 - OAuth2 Password Flow
+                                (Basic)</button> <span class="page-num">45</span></li>
+                <li><button type="button" class="toc-link" data-target="#chapter-19">CHAPTER 19 - JWT
+                                Authentication</button>
+                        <span class="page-num">48</span>
+                </li>
+                <li class="toc-section">PART IV - APP STRUCTURE & MIDDLEWARE</li>
+                <li><button type="button" class="toc-link" data-target="#chapter-20">CHAPTER 20 - Middleware</button>
+                        <span class="page-num">53</span></li>
+                <li><button type="button" class="toc-link" data-target="#chapter-21">CHAPTER 21 - CORS (Cross-Origin
+                                Resource
+                                Sharing)</button> <span class="page-num">55</span>
+                </li>
+                <li><button type="button" class="toc-link" data-target="#chapter-22">CHAPTER 22 - APIRouter (Splitting
+                                Your
+                                App)</button> <span class="page-num">57</span></li>
+                <li><button type="button" class="toc-link" data-target="#chapter-23">CHAPTER 23 - Bigger Applications
+                                Structure</button> <span class="page-num">60</span></li>
+                <li class="toc-section">PART V - ADVANCED TOPICS</li>
+                <li><button type="button" class="toc-link" data-target="#chapter-24">CHAPTER 24 - Background
+                                Tasks</button>
+                        <span class="page-num">63</span>
+                </li>
+                <li><button type="button" class="toc-link" data-target="#chapter-25">CHAPTER 25 - Static Files</button>
+                        <span class="page-num">65</span></li>
+                <li><button type="button" class="toc-link" data-target="#chapter-26">CHAPTER 26 - SQL Databases</button>
+                        <span class="page-num">67</span></li>
+                <li><button type="button" class="toc-link" data-target="#chapter-27">CHAPTER 27 - Custom
+                                Responses</button>
+                        <span class="page-num">70</span>
+                </li>
+                <li><button type="button" class="toc-link" data-target="#chapter-28">CHAPTER 28 - WebSockets</button>
+                        <span class="page-num">73</span></li>
+                <li><button type="button" class="toc-link" data-target="#chapter-29">CHAPTER 29 - Async & Concurrency
+                                Deep
+                                Dive</button> <span class="page-num">77</span></li>
+                <li><button type="button" class="toc-link" data-target="#chapter-30">CHAPTER 30 - Settings &
+                                Configuration</button> <span class="page-num">80</span></li>
+                <li><button type="button" class="toc-link" data-target="#chapter-31">CHAPTER 31 - Templates
+                                (Jinja2)</button>
+                        <span class="page-num">83</span>
+                </li>
+                <li class="toc-section">PART VI - DEPLOYMENT</li>
+                <li><button type="button" class="toc-link" data-target="#chapter-32">CHAPTER 32 - Concepts Before
+                                Deploying</button> <span class="page-num">86</span></li>
+                <li><button type="button" class="toc-link" data-target="#chapter-33">CHAPTER 33 - Docker
+                                Deployment</button>
+                        <span class="page-num">89</span>
+                </li>
+                <li><button type="button" class="toc-link" data-target="#chapter-34">CHAPTER 34 - Production
+                                Checklist</button>
+                        <span class="page-num">92</span>
+                </li>
+                <li class="toc-section">PART VII - REFERENCE</li>
+                <li><button type="button" class="toc-link" data-target="#chapter-35">CHAPTER 35 - FastAPI & APIRouter
+                                Reference</button> <span class="page-num">95</span></li>
+                <li><button type="button" class="toc-link" data-target="#chapter-36">CHAPTER 36 - HTTP Status Codes
+                                Reference</button> <span class="page-num">97</span></li>
+                <li><button type="button" class="toc-link" data-target="#chapter-37">CHAPTER 37 - Recommended Libraries
+                                Ecosystem</button> <span class="page-num">100</span>
+                </li>
+                <li><button type="button" class="toc-link" data-target="#chapter-38">CHAPTER 38 - FastAPI Cheat
+                                Sheet</button>
+                        <span class="page-num">102</span>
+                </li>
+                <li><button type="button" class="toc-link" data-target="#chapter-39">CHAPTER 39 - Architecture &
+                                Patterns</button> <span class="page-num">105</span></li>
+        </ul>
+        <div class="footer">
+                <span>FastAPI Complete Handbook</span>
+                <span>Page 2</span>
+        </div>
 </div>

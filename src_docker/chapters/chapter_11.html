@@ -1,7 +1,7 @@
 <div class="page" id="chapter-11">
-    <div class="header">CHAPTER 11 — Registry & Publishing</div>
+    <div class="header">CHAPTER 11 - Registry & Publishing</div>
 
-    <h2 style="margin-top: 0;">CHAPTER 11 — Docker Registry & Image Publishing</h2>
+    <h2 style="margin-top: 0;">CHAPTER 11 - Docker Registry & Image Publishing</h2>
 
     <h3>The Cloud Storage Mental Model</h3>
     <p>Writing a Dockerfile and building an image locally is fantastic, but we eventually need to put that image on a
@@ -36,7 +36,7 @@
 
 <!-- Chapter 11 Page 2 -->
 <div class="page">
-    <div class="header">CHAPTER 11 — Registry & Publishing</div>
+    <div class="header">CHAPTER 11 - Registry & Publishing</div>
 
     <h3>Real Example: Pushing to Docker Hub</h3>
     <p>Let's walk through the exact steps a developer takes to publish an image to the default Docker Hub.</p>
@@ -59,7 +59,8 @@ docker tag my-app cooldev/my-app:v1.0</code></pre>
         </li>
     </ol>
     <p>Our production server can now easily download this image across the world by running
-        <code>docker pull cooldev/my-app:v1.0</code>.</p>
+        <code>docker pull cooldev/my-app:v1.0</code>.
+    </p>
 
     <div class="footer">
         <span>Docker Complete Handbook</span>
@@ -69,7 +70,7 @@ docker tag my-app cooldev/my-app:v1.0</code></pre>
 
 <!-- Chapter 11 Page 3 -->
 <div class="page">
-    <div class="header">CHAPTER 11 — Registry & Publishing</div>
+    <div class="header">CHAPTER 11 - Registry & Publishing</div>
 
     <h3>GitHub Container Registry (ghcr.io)</h3>
     <p>Docker Hub is perfectly fine, but many teams already have their code sitting in GitHub. GitHub offers its own
@@ -94,7 +95,8 @@ docker push ghcr.io/my_github_org/my-app:v1.0</code></pre>
     <pre><code># Run the official, isolated local registry on port 5000
 docker run -d -p 5000:5000 --name local-registry registry:2</code></pre>
     <p>We can now tag and push deeply sensitive proprietary images directly to
-        <code>localhost:5000/top_secret_app:v1</code>.</p>
+        <code>localhost:5000/top_secret_app:v1</code>.
+    </p>
 
     <div class="footer">
         <span>Docker Complete Handbook</span>
@@ -104,7 +106,7 @@ docker run -d -p 5000:5000 --name local-registry registry:2</code></pre>
 
 <!-- Chapter 11 Page 4 -->
 <div class="page">
-    <div class="header">CHAPTER 11 — Registry & Publishing</div>
+    <div class="header">CHAPTER 11 - Registry & Publishing</div>
 
     <h3>Automating Builds (GitHub Actions)</h3>
     <p>We never want a human manually typing <code>docker push</code> from their laptop in production. Laptops have
