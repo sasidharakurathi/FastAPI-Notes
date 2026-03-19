@@ -1,0 +1,138 @@
+<div class="page" id="chapter-08">
+    <div class="header">CHAPTER 8 — Docker Networking</div>
+
+    <h2 style="margin-top: 0;">CHAPTER 8 — Docker Networking</h2>
+
+    <h3>The Default Networks</h3>
+    <p>When we install Docker, it automatically creates three default virtual networks. We can see them by running
+        <code>docker network ls</code>.</p>
+
+    <table class="reference-table">
+        <tr>
+            <th>Network Type</th>
+            <th>How It Works</th>
+        </tr>
+        <tr>
+            <td><strong>bridge (Default)</strong></td>
+            <td>A private internal walled-garden. Containers placed here can talk to the internet, but the outside world
+                cannot reach them unless we explicitly drill a hole (publish a port).</td>
+        </tr>
+        <tr>
+            <td><strong>host</strong></td>
+            <td>The container completely abandons isolation and shares the exact IP address and networking stack of our
+                host laptop/server.</td>
+        </tr>
+        <tr>
+            <td><strong>none</strong></td>
+            <td>Total isolation. The container has no access to the internet or any other containers. (Extremely rare,
+                used for high-security offline processing).</td>
+        </tr>
+    </table>
+
+    <h3>Network Management Commands</h3>
+    <p>By default, if we don't specify a network, every new container gets dumped into the default `bridge`. But best
+        practice dictates we create a custom network for every application layout.</p>
+
+    <div class="usage-box">
+        <code>docker network create my_app_net</code><br>
+        Creates a brand new virtual bridge network.<br><br>
+        <code>docker network inspect my_app_net</code><br>
+        Shows a JSON dump of exactly which containers are currently connected to this network and what internal IP
+        addresses they have been assigned.<br><br>
+        <code>docker network connect my_app_net my_container</code><br>
+        Attaches an already-running container into our newly created network dynamically.
+    </div>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 20</span>
+    </div>
+</div>
+
+<!-- Chapter 8 Page 2 -->
+<div class="page">
+    <div class="header">CHAPTER 8 — Docker Networking</div>
+
+    <h3>Container-to-Container Communication (Internal DNS)</h3>
+    <p>If we want our Python backend to talk to our PostgreSQL database, we could try logging into the database
+        container, finding its internal IP (e.g., `172.17.0.4`), and hardcoding that into our Python app.</p>
+    <p><strong>This is a terrible idea.</strong> Internal IPs change every time a container restarts.</p>
+
+    <p>Instead, Docker provides a magical internal <strong>DNS Resolver</strong>. If we put two containers on the
+        <em>same custom network</em>, Docker allows them to talk to each other using their container names as pure
+        hostnames.</p>
+
+    <h4>Real Example: Python Talking to Postgres</h4>
+    <p>Let's create a custom network and attach two containers so they can talk securely behind the scenes.</p>
+
+    <pre><code># 1. Create a private network
+docker network create backend_net
+
+# 2. Start Postgres, attach it to our network, and name it 'db'
+docker run -d --name db --network backend_net \
+  -e POSTGRES_PASSWORD=secret postgres:15
+
+# 3. Start Python, attach to the SAME network.
+docker run -it --name api --network backend_net python:3.11-slim bash</code></pre>
+
+    <p>Now, from <em>inside</em> the `api` container's bash prompt, if our Python code tries to connect to the database,
+        our Database URL doesn't use `localhost` or an IP address. It uses the exact container name:</p>
+    <pre><code># Inside the Python container
+DATABASE_URL="postgresql://postgres:secret@db:5432/postgres"</code></pre>
+    <p>Docker's internal DNS dynamically intercepts the word <code>db</code> and perfectly routes the traffic to the
+        Postgres container!</p>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 21</span>
+    </div>
+</div>
+
+<!-- Chapter 8 Page 3 -->
+<div class="page">
+    <div class="header">CHAPTER 8 — Docker Networking</div>
+
+    <h3>Publishing vs. Internal Networking (-p Flags)</h3>
+    <p>One of the biggest mistakes beginners make is thinking they must use <code>-p 5432:5432</code> on their database
+        so their backend container can talk to it.</p>
+
+    <div class="mistake-box">
+        <strong>⚠️ Warning: Unnecessary Port Publishing</strong><br>
+        Port publishing (<code>-p</code>) drills a hole from the <em>outside host machine</em> (our laptop) into the
+        container. Containers on the same Docker network can ALWAYS talk to each other on ANY port internally. If our
+        web app talks to our database, we do not need to publish the database port. By NOT publishing it, we keep the
+        database 100% hidden and secure from the outside world.
+    </div>
+
+    <p>We only use <code>-p 8080:80</code> when we explicitly want our laptop's web browser, or the public internet, to
+        reach inside the container.</p>
+
+    <h3>Host Networking: Linux vs. Mac/Windows</h3>
+    <p>Sometimes we want maximum performance, so we use <code>--network host</code>. This removes all networking
+        virtualization overhead.</p>
+
+    <table class="reference-table">
+        <tr>
+            <th>Platform</th>
+            <th>How `host` Networking Behaves</th>
+        </tr>
+        <tr>
+            <td><strong>Ubuntu / Linux Servers</strong></td>
+            <td>Works perfectly. The container directly uses the server's network interfaces with zero latency.</td>
+        </tr>
+        <tr>
+            <td><strong>Mac &amp; Windows (Docker Desktop)</strong></td>
+            <td><strong>Silently fails.</strong> Because Docker Desktop actually runs inside a hidden Linux VM,
+                attaching to the "host" network attaches it to the hidden VM's network, NOT our actual Mac/Windows
+                laptop.</td>
+        </tr>
+    </table>
+
+    <p>If we are developing on a Mac or Windows machine, we must rely on <code>-p</code> port forwarding. We save
+        <code>--network host</code> strictly for production Linux deployments.</p>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 22</span>
+    </div>
+</div>

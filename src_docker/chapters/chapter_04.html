@@ -1,0 +1,96 @@
+<div class="page" id="chapter-04">
+    <div class="header">CHAPTER 4 — Docker Images Deep Dive</div>
+
+    <h2 style="margin-top: 0;">CHAPTER 4 — Docker Images Deep Dive</h2>
+
+    <h3>What Exactly is an Image? (The Layer Cake)</h3>
+    <p>We often call a Docker Image a "blueprint". But structurally, an image is built like a stack of transparent
+        pancakes, called <strong>Layers</strong>.</p>
+    <p>Every single instruction (like <code>RUN apt-get install python</code>) in our Dockerfile creates a new,
+        permanent, read-only layer built on top of the previous one. When Docker pulls an image from the cloud, it
+        doesn't download one giant file; it smartly downloads these individual layers.</p>
+
+    <div class="plain-english-box">
+        <strong>Why layers are brilliant:</strong><br>
+        If we have 10 different apps that all use <code>ubuntu:latest</code> as their base, Docker doesn't download
+        Ubuntu 10 times. It securely shares the single cached Ubuntu layer across all 10 containers on our hard drive.
+        This saves massive amounts of disk space and download time.
+    </div>
+
+    <h3>Finding & Managing Images</h3>
+    <p>Let's look at the core commands we use to interact with our images locally:</p>
+
+    <div class="usage-box">
+        <code>docker images</code><br>
+        Lists all the images currently cached on our machine, showing their size and tags.<br><br>
+        <code>docker pull &lt;image_name&gt;</code><br>
+        Force-downloads an image from Docker Hub (or another registry) to our laptop without running it.<br><br>
+        <code>docker rmi &lt;image_id&gt;</code><br>
+        "Remove Image". Deletes the image from our hard drive to free up space. (Note: We cannot delete an image if a
+        container—even a stopped one—is currently currently attached to it).
+    </div>
+
+    <h3>Diving Deep: Docker Inspect</h3>
+    <p>Sometimes an image behaves strangely, and we need to know exactly what is inside it without spinning it up.</p>
+    <pre><code>docker inspect nginx</code></pre>
+    <p>This command returns a massive JSON file containing the absolute truth about the image. We use this to find out:
+    </p>
+    <ul>
+        <li>Exactly which ports it intends to expose (the `ExposedPorts` field).</li>
+        <li>Any default Environment Variables it expects us to pass.</li>
+        <li>The default `Cmd` or `Entrypoint` (what command it automatically runs on boot).</li>
+    </ul>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 8</span>
+    </div>
+</div>
+
+<!-- Chapter 4 Page 2 -->
+<div class="page">
+    <div class="header">CHAPTER 4 — Docker Images Deep Dive</div>
+
+    <h3>Official vs. Custom Images</h3>
+    <p>When searching Docker Hub, we see millions of images. We must be highly selective about which ones we trust to
+        run on our servers.</p>
+    <ul>
+        <li><strong>Official Images:</strong> Handled by Canonical (Ubuntu), Docker, or the specific open-source
+            foundation (e.g., Python, Node, Redis). They are actively scanned for security vulnerabilities. We should
+            heavily favor these as our bases.</li>
+        <li><strong>Verified Publisher Images:</strong> Built by trusted companies like Bitnami. Generally very safe,
+            but we must verify the publisher checkmark on Docker Hub.</li>
+        <li><strong>Random Community Images:</strong> E.g., `someguy99/cool-nginx-hack`. <strong>Never use these in
+                production.</strong> They might contain outdated software, massive security holes, or literal
+            crypto-miners.</li>
+    </ul>
+
+    <h3>The Tagging Strategy</h3>
+    <p>Every image has a name (like <code>postgres</code>) and a tag (like <code>:15-alpine</code>). A tag acts exactly
+        like a version number.</p>
+
+    <div class="mistake-box">
+        <strong>⚠️ The "Latest" Trap:</strong><br>
+        If we don't specify a tag, Docker automatically applies the <code>:latest</code> tag. Beginners love using
+        <code>node:latest</code>. <strong>Do not do this in production.</strong><br><br>
+        `latest` is a moving target. Today it might point to Node 20. Tomorrow, it might point to Node 22, severely
+        breaking our app. We must strictly pin our versions (e.g., <code>node:20.12.0-alpine</code>) to ensure our code
+        always works.
+    </div>
+
+    <h3>Cleaning Up the Mess</h3>
+    <p>Over months of development, our hard drive will fill up with gigabytes of "dangling" images—old layers that are
+        no longer associated with any active image tag because we rebuilt our code 500 times.</p>
+
+    <p>To safely nuke all unused, orphaned image layers and reclaim our disk space, we run the ultimate janitor command:
+    </p>
+    <pre><code>docker image prune</code></pre>
+
+    <p>If we want to aggressively wipe out absolutely every image not currently attached to a running container, we add
+        the <code>-a</code> flag (<code>docker image prune -a</code>). This gives us a blank slate!</p>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 9</span>
+    </div>
+</div>

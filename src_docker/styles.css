@@ -101,6 +101,10 @@ button {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+.top-link:visited {
+  color: #ccdef7;
+}
+
 .top-link-btn {
   appearance: none;
   background: transparent;
@@ -152,6 +156,10 @@ button {
   color: #f4f9ff;
 }
 
+.top-link.active:visited {
+  color: #f4f9ff;
+}
+
 .layout {
   display: flex;
   width: 100%;
@@ -189,7 +197,14 @@ button {
   margin-bottom: 8px;
 }
 
-.toc-list a {
+.toc-list a,
+.toc-link {
+  appearance: none;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
   text-decoration: none;
   color: #d4e3fa;
   font-size: 0.98rem;
@@ -197,7 +212,6 @@ button {
   display: block;
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px solid transparent;
   transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   overflow-wrap: anywhere;
   display: grid;
@@ -225,7 +239,9 @@ button {
 }
 
 .toc-list a:hover,
-.toc-list a.active {
+.toc-list a.active,
+.toc-link:hover,
+.toc-link.active {
   background: rgba(36, 150, 237, 0.14);
   color: #e7f2ff;
   border-color: rgba(36, 150, 237, 0.34);
@@ -454,15 +470,32 @@ pre code {
   transition: transform 0.18s ease, filter 0.18s ease;
 }
 
+.nav-btn:visited {
+  color: #031221;
+}
+
 .nav-btn:hover {
   filter: brightness(0.94);
   transform: translateY(-1px);
+}
+
+.nav-btn:hover,
+.nav-btn:focus-visible,
+.nav-btn:active,
+.nav-btn:hover:visited,
+.nav-btn:focus-visible:visited,
+.nav-btn:active:visited {
+  color: #031221;
 }
 
 .nav-btn.disabled {
   background-color: #2b3e5d;
   color: #9fb0ca;
   pointer-events: none;
+}
+
+.nav-btn.disabled:visited {
+  color: #9fb0ca;
 }
 
 .cover-page + .nav-buttons {
@@ -481,10 +514,23 @@ pre code {
   box-shadow: 0 10px 24px rgba(21, 104, 173, 0.38);
 }
 
+.cover-page + .nav-buttons .nav-btn:visited {
+  color: #041a31;
+}
+
 .cover-page + .nav-buttons .nav-btn:hover {
   transform: translateY(-2px);
   filter: brightness(1.02);
   box-shadow: 0 14px 30px rgba(21, 104, 173, 0.44);
+}
+
+.cover-page + .nav-buttons .nav-btn:hover,
+.cover-page + .nav-buttons .nav-btn:focus-visible,
+.cover-page + .nav-buttons .nav-btn:active,
+.cover-page + .nav-buttons .nav-btn:hover:visited,
+.cover-page + .nav-buttons .nav-btn:focus-visible:visited,
+.cover-page + .nav-buttons .nav-btn:active:visited {
+  color: #041a31;
 }
 
 table {
@@ -503,6 +549,34 @@ td {
 th {
   background-color: rgba(36, 150, 237, 0.1);
   color: #b3ddff;
+}
+
+.link-status {
+  position: fixed;
+  left: 12px;
+  bottom: 10px;
+  z-index: 1200;
+  max-width: min(460px, calc(100vw - 24px));
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(36, 150, 237, 0.55);
+  background: rgba(10, 20, 36, 0.95);
+  color: #e9f3ff;
+  font-size: 9.5pt;
+  line-height: 1.2;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+  transition: opacity 0.16s ease, transform 0.16s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.link-status.is-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 @media print {
@@ -643,7 +717,8 @@ th {
     margin: 0;
   }
 
-  .toc-list a {
+  .toc-list a,
+  .toc-link {
     width: 100%;
     white-space: normal;
     border: 1px solid rgba(36, 150, 237, 0.28);

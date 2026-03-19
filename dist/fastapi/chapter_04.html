@@ -107,6 +107,10 @@ button {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+.top-link:visited {
+  color: #c4ece7;
+}
+
 .top-link-btn {
   appearance: none;
   background: transparent;
@@ -155,6 +159,10 @@ button {
 
 .top-link.active {
   background: rgba(16, 191, 174, 0.22);
+  color: #ecfffc;
+}
+
+.top-link.active:visited {
   color: #ecfffc;
 }
 
@@ -215,15 +223,32 @@ button {
   transition: transform 0.18s ease, filter 0.18s ease;
 }
 
+.nav-btn:visited {
+  color: #031312;
+}
+
 .nav-btn:hover {
   filter: brightness(0.94);
   transform: translateY(-1px);
+}
+
+.nav-btn:hover,
+.nav-btn:focus-visible,
+.nav-btn:active,
+.nav-btn:hover:visited,
+.nav-btn:focus-visible:visited,
+.nav-btn:active:visited {
+  color: #031312;
 }
 
 .nav-btn.disabled {
   background-color: #2a3f40;
   color: #91a6a3;
   pointer-events: none;
+}
+
+.nav-btn.disabled:visited {
+  color: #91a6a3;
 }
 
 .cover-page + .nav-buttons {
@@ -242,10 +267,23 @@ button {
   box-shadow: 0 10px 24px rgba(10, 153, 139, 0.35);
 }
 
+.cover-page + .nav-buttons .nav-btn:visited {
+  color: #03211f;
+}
+
 .cover-page + .nav-buttons .nav-btn:hover {
   transform: translateY(-2px);
   filter: brightness(1.02);
   box-shadow: 0 14px 30px rgba(10, 153, 139, 0.42);
+}
+
+.cover-page + .nav-buttons .nav-btn:hover,
+.cover-page + .nav-buttons .nav-btn:focus-visible,
+.cover-page + .nav-buttons .nav-btn:active,
+.cover-page + .nav-buttons .nav-btn:hover:visited,
+.cover-page + .nav-buttons .nav-btn:focus-visible:visited,
+.cover-page + .nav-buttons .nav-btn:active:visited {
+  color: #03211f;
 }
 
 .page {
@@ -547,23 +585,29 @@ th {
   padding-top: 8px;
 }
 
+.toc-list .page-num {
+  color: var(--text-muted);
+  margin-left: 8px;
+}
+
 .link-status {
   position: fixed;
-  left: 14px;
-  bottom: 14px;
+  left: 12px;
+  bottom: 10px;
   z-index: 1200;
-  max-width: min(520px, calc(100vw - 28px));
-  padding: 8px 12px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #0da89a, #0b7d71);
-  color: #f4fffd;
-  font-size: 10pt;
-  line-height: 1.3;
-  box-shadow: 0 10px 24px rgba(0, 121, 107, 0.28);
+  max-width: min(460px, calc(100vw - 24px));
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(16, 191, 174, 0.5);
+  background: rgba(7, 25, 26, 0.95);
+  color: #dcfffb;
+  font-size: 9.5pt;
+  line-height: 1.2;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
   opacity: 0;
-  transform: translateY(8px);
+  transform: translateY(6px);
   pointer-events: none;
-  transition: opacity 0.18s ease, transform 0.18s ease;
+  transition: opacity 0.16s ease, transform 0.16s ease;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -572,11 +616,6 @@ th {
 .link-status.is-visible {
   opacity: 1;
   transform: translateY(0);
-}
-
-.toc-list .page-num {
-  color: var(--text-muted);
-  margin-left: 8px;
 }
 
 @page {
@@ -879,45 +918,45 @@ th {
         <nav class="sidebar" id="toc-sidebar">
             <h3>Table of Contents</h3>
             <ul class="toc-list">
-<li><a href="/fastapi/chapter_01.html">CHAPTER 1 - What is FastAPI and Why Should You Care?</a></li>
-<li><a href="/fastapi/chapter_02.html">CHAPTER 2 - Setting Up Our First FastAPI App</a></li>
-<li><a href="/fastapi/chapter_03.html">CHAPTER 3 - Path Operations (The Building Blocks)</a></li>
-<li><a href="/fastapi/chapter_04.html">CHAPTER 4 - Path Parameters</a></li>
-<li><a href="/fastapi/chapter_05.html">CHAPTER 5 - Query Parameters</a></li>
-<li><a href="/fastapi/chapter_06.html">CHAPTER 6 - Request Bodies</a></li>
-<li><a href="/fastapi/chapter_07.html">CHAPTER 7 - Body Fields & Nested Models</a></li>
-<li><a href="/fastapi/chapter_08.html">CHAPTER 8 - Request Examples & Schema Configuration</a></li>
-<li><a href="/fastapi/chapter_09.html">CHAPTER 9 - Extra Data Types</a></li>
-<li><a href="/fastapi/chapter_10.html">CHAPTER 10 - Cookie Parameters</a></li>
-<li><a href="/fastapi/chapter_11.html">CHAPTER 11 - Header Parameters</a></li>
-<li><a href="/fastapi/chapter_12.html">CHAPTER 12 - Response Model & Status Codes</a></li>
-<li><a href="/fastapi/chapter_13.html">CHAPTER 13 - Form Data</a></li>
-<li><a href="/fastapi/chapter_14.html">CHAPTER 14 - File Uploads</a></li>
-<li><a href="/fastapi/chapter_15.html">CHAPTER 15 - Handling Errors</a></li>
-<li><a href="/fastapi/chapter_16.html">CHAPTER 16 - Introduction to Dependencies</a></li>
-<li><a href="/fastapi/chapter_17.html">CHAPTER 17 - Security Overview</a></li>
-<li><a href="/fastapi/chapter_18.html">CHAPTER 18 - OAuth2 Password Flow (Basic)</a></li>
-<li><a href="/fastapi/chapter_19.html">CHAPTER 19 - JWT Authentication</a></li>
-<li><a href="/fastapi/chapter_20.html">CHAPTER 20 - Middleware</a></li>
-<li><a href="/fastapi/chapter_21.html">CHAPTER 21 - CORS (Cross-Origin Resource Sharing)</a></li>
-<li><a href="/fastapi/chapter_22.html">CHAPTER 22 - APIRouter (Splitting Your App)</a></li>
-<li><a href="/fastapi/chapter_23.html">CHAPTER 23 - Bigger Applications Structure</a></li>
-<li><a href="/fastapi/chapter_24.html">CHAPTER 24 - Background Tasks</a></li>
-<li><a href="/fastapi/chapter_25.html">CHAPTER 25 - Static Files</a></li>
-<li><a href="/fastapi/chapter_26.html">CHAPTER 26 - SQL Databases</a></li>
-<li><a href="/fastapi/chapter_27.html">CHAPTER 27 - Custom Responses</a></li>
-<li><a href="/fastapi/chapter_28.html">CHAPTER 28 - WebSockets</a></li>
-<li><a href="/fastapi/chapter_29.html">CHAPTER 29 - Async & Concurrency Deep Dive</a></li>
-<li><a href="/fastapi/chapter_30.html">CHAPTER 30 - Settings & Configuration</a></li>
-<li><a href="/fastapi/chapter_31.html">CHAPTER 31 - Templates (Jinja2)</a></li>
-<li><a href="/fastapi/chapter_32.html">CHAPTER 32 - Concepts Before Deploying</a></li>
-<li><a href="/fastapi/chapter_33.html">CHAPTER 33 - Docker Deployment</a></li>
-<li><a href="/fastapi/chapter_34.html">CHAPTER 34 - Production Checklist</a></li>
-<li><a href="/fastapi/chapter_35.html">CHAPTER 35 - FastAPI & APIRouter Reference</a></li>
-<li><a href="/fastapi/chapter_36.html">CHAPTER 36 - HTTP Status Codes Reference</a></li>
-<li><a href="/fastapi/chapter_37.html">CHAPTER 37 - Recommended Libraries Ecosystem</a></li>
-<li><a href="/fastapi/chapter_38.html">CHAPTER 38 - FastAPI Cheat Sheet</a></li>
-<li><a href="/fastapi/chapter_39.html">CHAPTER 39 - Architecture & Patterns</a></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_01.html">CHAPTER 1 - What is FastAPI and Why Should You Care?</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_02.html">CHAPTER 2 - Setting Up Our First FastAPI App</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_03.html">CHAPTER 3 - Path Operations (The Building Blocks)</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_04.html">CHAPTER 4 - Path Parameters</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_05.html">CHAPTER 5 - Query Parameters</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_06.html">CHAPTER 6 - Request Bodies</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_07.html">CHAPTER 7 - Body Fields & Nested Models</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_08.html">CHAPTER 8 - Request Examples & Schema Configuration</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_09.html">CHAPTER 9 - Extra Data Types</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_10.html">CHAPTER 10 - Cookie Parameters</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_11.html">CHAPTER 11 - Header Parameters</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_12.html">CHAPTER 12 - Response Model & Status Codes</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_13.html">CHAPTER 13 - Form Data</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_14.html">CHAPTER 14 - File Uploads</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_15.html">CHAPTER 15 - Handling Errors</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_16.html">CHAPTER 16 - Introduction to Dependencies</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_17.html">CHAPTER 17 - Security Overview</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_18.html">CHAPTER 18 - OAuth2 Password Flow (Basic)</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_19.html">CHAPTER 19 - JWT Authentication</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_20.html">CHAPTER 20 - Middleware</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_21.html">CHAPTER 21 - CORS (Cross-Origin Resource Sharing)</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_22.html">CHAPTER 22 - APIRouter (Splitting Your App)</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_23.html">CHAPTER 23 - Bigger Applications Structure</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_24.html">CHAPTER 24 - Background Tasks</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_25.html">CHAPTER 25 - Static Files</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_26.html">CHAPTER 26 - SQL Databases</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_27.html">CHAPTER 27 - Custom Responses</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_28.html">CHAPTER 28 - WebSockets</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_29.html">CHAPTER 29 - Async & Concurrency Deep Dive</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_30.html">CHAPTER 30 - Settings & Configuration</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_31.html">CHAPTER 31 - Templates (Jinja2)</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_32.html">CHAPTER 32 - Concepts Before Deploying</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_33.html">CHAPTER 33 - Docker Deployment</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_34.html">CHAPTER 34 - Production Checklist</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_35.html">CHAPTER 35 - FastAPI & APIRouter Reference</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_36.html">CHAPTER 36 - HTTP Status Codes Reference</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_37.html">CHAPTER 37 - Recommended Libraries Ecosystem</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_38.html">CHAPTER 38 - FastAPI Cheat Sheet</button></li>
+<li><button class="toc-link" type="button" data-href="/fastapi/chapter_39.html">CHAPTER 39 - Architecture & Patterns</button></li>
 </ul>
         </nav>
         <main class="content-wrapper">

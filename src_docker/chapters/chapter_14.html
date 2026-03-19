@@ -1,0 +1,193 @@
+<div class="page" id="chapter-14">
+    <div class="header">CHAPTER 14 — Useful Patterns</div>
+
+    <h2 style="margin-top: 0;">CHAPTER 14 — Useful Patterns & Real-World Recipes</h2>
+
+    <h3>The Sidecar Pattern</h3>
+    <p>Sometimes our main application needs a helper. A "Sidecar" is a secondary container deployed right next to our
+        primary application container, exclusively there to provide supporting features like logging, metrics, or a
+        reverse proxy.</p>
+
+    <pre><code>services:
+  # The Primary App
+  api:
+    image: my-python-app
+    ports:
+      - "8000:8000"
+
+  # The Sidecar (Datadog Agent gathering metrics)
+  datadog:
+    image: datadog/agent:latest
+    environment:
+      - DD_API_KEY=${DD_API_KEY}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro</code></pre>
+
+    <p>By splitting them, if the Datadog agent crashes, our Python API stays perfectly alive. We decouple our monitoring
+        from our business logic.</p>
+
+    <h3>Init Containers</h3>
+    <p>Sometimes, we must guarantee that a specific task finishes <em>before</em> our main application boots up. For
+        example, running strict configuration generation, or waiting for an external service.</p>
+
+    <div class="plain-english-box">
+        <strong>Init Pattern Explained:</strong><br>
+        We run a temporary container that does the work. Our main application uses
+        <code>depends_on: [init_container]</code> with a <code>condition: service_completed_successfully</code>. If the
+        Init container fails, the main app never boots!
+    </div>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 43</span>
+    </div>
+</div>
+
+<!-- Chapter 14 Page 2 -->
+<div class="page">
+    <div class="header">CHAPTER 14 — Useful Patterns</div>
+
+    <h3>One-off Task Containers</h3>
+    <p>We often need to run a temporary script—like downloading a specific file, parsing a JSON, or generating a quick
+        RSA key—but we absolutely do not want to pollute our laptop with global node modules or curl configurations.</p>
+
+    <div class="usage-box">
+        <code>docker run --rm alpine sed...</code><br>
+        The <code>--rm</code> flag is magical. It tells Docker to boot the container, run the single command, and the
+        exact millisecond the command finishes, <strong>delete the container permanently</strong>.
+    </div>
+
+    <pre><code># Generate a quick secure secret securely without installing openSSL locally
+docker run --rm alpine sh -c "apk add openssl && openssl rand -hex 32"</code></pre>
+
+    <h3>Database Migration Containers</h3>
+    <p>How do we run our schema migrations (like Django Alembic, Prisma, or TypeORM) in production? We do NOT put the
+        `migrate` command directly inside our Web API's <code>CMD</code>! If we do, when we scale up to 10 web servers,
+        10 servers will all violently try to migrate the exact same database simultaneously, causing horrific lock
+        corruption.</p>
+
+    <p>Instead, we run <strong>one dedicated migration container</strong> during deployment <em>before</em> we launch
+        the new web servers.</p>
+
+    <pre><code>services:
+  # The one-off Migration Runner
+  migrator:
+    image: my-app:latest
+    command: npm run prisma migrate deploy # Runs the migration then exits!
+    environment:
+      DATABASE_URL: ${DB_URL}
+
+  api:
+    image: my-app:latest
+    depends_on:
+      migrator:
+        condition: service_completed_successfully # The API waits for the green light
+    command: npm run start</code></pre>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 44</span>
+    </div>
+</div>
+
+<!-- Chapter 14 Page 3 -->
+<div class="page">
+    <div class="header">CHAPTER 14 — Useful Patterns</div>
+
+    <h3>Cron Job Containers</h3>
+    <p>If we want to run a script every 5 minutes (like cleaning up old sessions or scraping an API), we don't need a
+        heavy scheduling framework. We can literally run a container whose sole purpose is sleeping and running a loop.
+    </p>
+
+    <pre><code># Example: A container that hits an endpoint every 60 seconds forever
+services:
+  ping_bot:
+    image: alpine:latest
+    command: sh -c "while true; do wget -qO- http://api:8000/health; sleep 60; done"</code></pre>
+
+    <h3>Health Checks in Production</h3>
+    <p>Docker naturally assumes a container is "Healthy" as long as the process hasn't crashed. But what if our Node app
+        is stuck in a deadlocked While Loop? The process is running, but our users see infinite timeouts. We must use a
+        <code>HEALTHCHECK</code>.</p>
+
+    <pre><code>FROM python:3.11-slim
+# ... setup app ...
+
+# Every 30 seconds, Docker will literally ping our internal endpoint. 
+# If it fails 3 times in a row, Docker marks the container as "Unhealthy".
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+  CMD curl -f http://127.0.0.1:8000/health || exit 1
+
+CMD ["uvicorn", "main:app"]</code></pre>
+
+    <div class="mistake-box">
+        <strong>⚠️ Healthcheck and Load Balancers:</strong><br>
+        Docker Compose doesn't automatically restart Unhealthy containers by default. However, advanced orchestrators
+        like Docker Swarm or Kubernetes explicitly rely on this specific script to automatically kill and replace frozen
+        containers. Never skip it in production.
+    </div>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 45</span>
+    </div>
+</div>
+
+<!-- Chapter 14 Page 4 -->
+<div class="page">
+    <div class="header">CHAPTER 14 — Useful Patterns</div>
+
+    <h3>Container Auto-Restart Policies</h3>
+    <p>If our Node server suddenly crashes due to a massive memory spike, what happens? By default, the container dies
+        and stays completely dead forever. In production, we need a guarantee of high availability.</p>
+
+    <p>We use the <code>--restart</code> flag, or the <code>restart:</code> directive in Compose.</p>
+
+    <table class="reference-table">
+        <tr>
+            <th>Policy</th>
+            <th>How It Operates</th>
+        </tr>
+        <tr>
+            <td><code>no</code></td>
+            <td><strong>(Default)</strong> If it crashes, it's done. Never restarts automatically.</td>
+        </tr>
+        <tr>
+            <td><code>always</code></td>
+            <td>If it crashes, Docker aggressively restarts it. If we restart the host physical server, Docker instantly
+                reboots the container on startup. Only way to permanently stop it is by explicitly running
+                <code>docker stop</code>.</td>
+        </tr>
+        <tr>
+            <td><code>unless-stopped</code></td>
+            <td><strong>(The Production Standard)</strong> Acts identical to `always`, EXCEPT if we explicitly typed
+                `docker stop` <em>before</em> the server rebooted, Docker respects our wishes and leaves it offline.
+            </td>
+        </tr>
+        <tr>
+            <td><code>on-failure</code></td>
+            <td>Only restarts if the internal script crashed throwing a tragic error code (Not `0`). Leaves it alone if
+                the script finished its job peacefully.</td>
+        </tr>
+    </table>
+
+    <h3>Logging Drivers Overview</h3>
+    <p>By default, Docker captures all standard output into giant JSON files heavily hidden on the host OS. If our app
+        logs millions of events, these files can rapidly consume our entire hard drive.</p>
+    <p>We solve this by explicitly limiting log size, or completely shipping our logs directly to external logging tools
+        (like Datadog, AWS CloudWatch, or Splunk) via <strong>Logging Drivers</strong>.</p>
+
+    <pre><code>services:
+  api:
+    image: my-app:latest
+    logging:
+      driver: "json-file" # Ensure we use the default driver
+      options:
+        max-size: "10m"   # Maximum 10MB per log file
+        max-file: "3"     # Keep only the 3 most recent files, then overwrite!</code></pre>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 46</span>
+    </div>
+</div>

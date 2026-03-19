@@ -1,0 +1,233 @@
+<div class="page" id="chapter-05">
+    <div class="header">CHAPTER 5 — Writing Dockerfiles</div>
+
+    <h2 style="margin-top: 0;">CHAPTER 5 — Writing Dockerfiles (The Core Skill)</h2>
+
+    <h3>The Build Context and .dockerignore</h3>
+    <p>Before we even write a Dockerfile, we must understand the <strong>Build Context</strong>. When we type
+        <code>docker build .</code>, the Docker CLI gathers every single file and folder in the current directory and
+        sends it to the Docker Daemon to be processed.</p>
+
+    <div class="mistake-box">
+        <strong>⚠️ The 1GB Upload Trap:</strong><br>
+        If we don't filter our context, Docker will upload our massive <code>node_modules/</code>, our virtual
+        environments, and our `.git/` folder to the daemon on every single build. This makes builds incredibly slow and
+        bloated.
+    </div>
+
+    <p>To fix this, we ALWAYS create a <code>.dockerignore</code> file in the root of our project. It works exactly like
+        a `.gitignore`.</p>
+    <pre><code># .dockerignore
+.git
+node_modules/
+venv/
+__pycache__/
+.env</code></pre>
+
+    <h3>The Core Instructions</h3>
+    <p>A Dockerfile is a simple script. Let's break down the actual commands we use to construct our image layers.</p>
+
+    <table class="reference-table">
+        <tr>
+            <th>Command</th>
+            <th>What it does</th>
+        </tr>
+        <tr>
+            <td><strong>FROM</strong></td>
+            <td>Must be the first line. Sets the base image (e.g., <code>FROM python:3.11-slim</code>).</td>
+        </tr>
+        <tr>
+            <td><strong>WORKDIR</strong></td>
+            <td>Creates a folder inside the container and CD's into it. All following commands run here (e.g.,
+                <code>WORKDIR /app</code>).</td>
+        </tr>
+        <tr>
+            <td><strong>COPY</strong></td>
+            <td>Copies files from our laptop into the container (e.g., <code>COPY package.json .</code>).</td>
+        </tr>
+        <tr>
+            <td><strong>ADD</strong></td>
+            <td>Like COPY, but it can also auto-extract `.tar.gz` files and download from URLs. (We generally prefer
+                COPY unless we specifically need ADD's magic).</td>
+        </tr>
+        <tr>
+            <td><strong>RUN</strong></td>
+            <td>Executes a terminal command during the <em>build</em> phase to install things (e.g.,
+                <code>RUN pip install -r requirements.txt</code>). Creates a new layer.</td>
+        </tr>
+    </table>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 10</span>
+    </div>
+</div>
+
+<!-- Chapter 5 Page 2 -->
+<div class="page">
+    <div class="header">CHAPTER 5 — Writing Dockerfiles</div>
+
+    <h3>More Configuration Instructions</h3>
+    <table class="reference-table">
+        <tr>
+            <th>Command</th>
+            <th>What it does</th>
+        </tr>
+        <tr>
+            <td><strong>ENV</strong></td>
+            <td>Sets persistent environment variables that exist while the container is running (e.g.,
+                <code>ENV NODE_ENV=production</code>).</td>
+        </tr>
+        <tr>
+            <td><strong>ARG</strong></td>
+            <td>Like ENV, but only exists during the <em>build</em> phase. Useful for passing in dynamic build versions.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>EXPOSE</strong></td>
+            <td>Purely documentation. Tells other developers which port this container listens on (e.g.,
+                <code>EXPOSE 8080</code>). Does NOT actually publish the port.</td>
+        </tr>
+        <tr>
+            <td><strong>USER</strong></td>
+            <td>Switches from the default `root` user to a safer, restricted user for security (e.g.,
+                <code>USER node</code>).</td>
+        </tr>
+        <tr>
+            <td><strong>VOLUME</strong></td>
+            <td>Marks a specific directory to be mounted as a permanent volume, bypassing the ephemeral filesystem.</td>
+        </tr>
+        <tr>
+            <td><strong>LABEL</strong></td>
+            <td>Adds metadata to an image (e.g., <code>LABEL maintainer="team@example.com"</code>).</td>
+        </tr>
+        <tr>
+            <td><strong>HEALTHCHECK</strong></td>
+            <td>Tells Docker how to test if our app is actually healthy, not just if the process is running.</td>
+        </tr>
+        <tr>
+            <td><strong>ONBUILD</strong></td>
+            <td>A trigger instruction that executes only if someone else uses OUR image as their base <code>FROM</code>
+                image.</td>
+        </tr>
+    </table>
+
+    <h3>CMD vs. ENTRYPOINT (The Ultimate Confusion)</h3>
+    <p>Both of these commands dictate what our container actually DOES when it finishes booting. But they have a crucial
+        difference.</p>
+
+    <div class="plain-english-box">
+        <strong>CMD (The Default Suggestion)</strong><br>
+        <code>CMD ["python", "app.py"]</code><br>
+        This provides a default command. However, if a user types <code>docker run my-app bash</code>, the user's `bash`
+        command completely overrides and replaces our CMD.
+        <br><br>
+        <strong>ENTRYPOINT (The Hard Rule)</strong><br>
+        <code>ENTRYPOINT ["python", "app.py"]</code><br>
+        This locks the container into running this exact executable. If a user types
+        <code>docker run my-app --help</code>, Docker appends `--help` as an argument to our Entrypoint, effectively
+        running `python app.py --help`.
+    </div>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 11</span>
+    </div>
+</div>
+
+<!-- Chapter 5 Page 3 -->
+<div class="page">
+    <div class="header">CHAPTER 5 — Writing Dockerfiles</div>
+
+    <h3>Best Practices: Layer Caching & Ordering</h3>
+    <p>Docker caches layers to speed up builds. If a layer hasn't changed, Docker instantly reuses the cached version.
+        However, <strong>if one layer changes, every single layer below it is forcibly rebuilt.</strong></p>
+
+    <p>Because source code changes frequently, but dependencies (like libraries) change rarely, we must ALWAYS copy our
+        dependency files and install them <em>before</em> we copy our source code.</p>
+
+    <h4>Example 1: Dockerizing a FastAPI (Python) App</h4>
+    <pre><code>FROM python:3.11-slim
+
+# Create our working directory
+WORKDIR /app
+
+# COPY ONLY the tiny requirements file first!
+COPY requirements.txt .
+
+# Install dependencies (This layer gets heavily cached!)
+RUN pip install --no-cache-dir -r requirements.txt
+
+# NOW copy our frequently-changing source code
+COPY . .
+
+# Run as a non-root user for security
+RUN useradd -m myuser
+USER myuser
+
+EXPOSE 8000
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]</code></pre>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 12</span>
+    </div>
+</div>
+
+<!-- Chapter 5 Page 4 -->
+<div class="page">
+    <div class="header">CHAPTER 5 — Writing Dockerfiles</div>
+
+    <h4>Example 2: Dockerizing a Node.js/Express App</h4>
+    <p>The exact same caching logic applies to Node.js applications.</p>
+    <pre><code>FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy only the package files first
+COPY package.json package-lock.json ./
+
+# Install npm dependencies securely
+RUN npm ci --only=production
+
+# Copy the rest of the application
+COPY . .
+
+# Switch to the pre-existing 'node' user in the alpine image
+USER node
+
+EXPOSE 3000
+
+CMD ["node", "server.js"]</code></pre>
+
+    <h4>Example 3: Dockerizing a React App (Multi-Stage Build)</h4>
+    <p>A React app requires heavy compilation tools (Node, Webpack) to build the static HTML/JS, but to actually
+        <em>serve</em> those files, we only need a tiny, lightweight Nginx server. <strong>Multi-stage builds</strong>
+        let us use multiple `FROM` statements to leave the heavy build tools behind.</p>
+
+    <pre><code># --- Stage 1: The Builder ---
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+# The compiled files now live in /app/dist
+
+# --- Stage 2: The Production Server ---
+FROM nginx:alpine
+# We ONLY copy the final built files from Stage 1. 
+# Node.js and all its heavy modules are completely discarded!
+COPY --from=builder /app/dist /usr/share/nginx/html/
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]</code></pre>
+
+    <p>This multi-stage approach reduces our final image size from ~1GB down to a shockingly lean ~20MB!</p>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 13</span>
+    </div>
+</div>

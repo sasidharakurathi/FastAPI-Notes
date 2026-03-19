@@ -107,6 +107,10 @@ button {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+.top-link:visited {
+  color: #ccdef7;
+}
+
 .top-link-btn {
   appearance: none;
   background: transparent;
@@ -158,6 +162,10 @@ button {
   color: #f4f9ff;
 }
 
+.top-link.active:visited {
+  color: #f4f9ff;
+}
+
 .layout {
   display: flex;
   width: 100%;
@@ -195,7 +203,14 @@ button {
   margin-bottom: 8px;
 }
 
-.toc-list a {
+.toc-list a,
+.toc-link {
+  appearance: none;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
   text-decoration: none;
   color: #d4e3fa;
   font-size: 0.98rem;
@@ -203,7 +218,6 @@ button {
   display: block;
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px solid transparent;
   transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   overflow-wrap: anywhere;
   display: grid;
@@ -231,7 +245,9 @@ button {
 }
 
 .toc-list a:hover,
-.toc-list a.active {
+.toc-list a.active,
+.toc-link:hover,
+.toc-link.active {
   background: rgba(36, 150, 237, 0.14);
   color: #e7f2ff;
   border-color: rgba(36, 150, 237, 0.34);
@@ -460,15 +476,32 @@ pre code {
   transition: transform 0.18s ease, filter 0.18s ease;
 }
 
+.nav-btn:visited {
+  color: #031221;
+}
+
 .nav-btn:hover {
   filter: brightness(0.94);
   transform: translateY(-1px);
+}
+
+.nav-btn:hover,
+.nav-btn:focus-visible,
+.nav-btn:active,
+.nav-btn:hover:visited,
+.nav-btn:focus-visible:visited,
+.nav-btn:active:visited {
+  color: #031221;
 }
 
 .nav-btn.disabled {
   background-color: #2b3e5d;
   color: #9fb0ca;
   pointer-events: none;
+}
+
+.nav-btn.disabled:visited {
+  color: #9fb0ca;
 }
 
 .cover-page + .nav-buttons {
@@ -487,10 +520,23 @@ pre code {
   box-shadow: 0 10px 24px rgba(21, 104, 173, 0.38);
 }
 
+.cover-page + .nav-buttons .nav-btn:visited {
+  color: #041a31;
+}
+
 .cover-page + .nav-buttons .nav-btn:hover {
   transform: translateY(-2px);
   filter: brightness(1.02);
   box-shadow: 0 14px 30px rgba(21, 104, 173, 0.44);
+}
+
+.cover-page + .nav-buttons .nav-btn:hover,
+.cover-page + .nav-buttons .nav-btn:focus-visible,
+.cover-page + .nav-buttons .nav-btn:active,
+.cover-page + .nav-buttons .nav-btn:hover:visited,
+.cover-page + .nav-buttons .nav-btn:focus-visible:visited,
+.cover-page + .nav-buttons .nav-btn:active:visited {
+  color: #041a31;
 }
 
 table {
@@ -509,6 +555,34 @@ td {
 th {
   background-color: rgba(36, 150, 237, 0.1);
   color: #b3ddff;
+}
+
+.link-status {
+  position: fixed;
+  left: 12px;
+  bottom: 10px;
+  z-index: 1200;
+  max-width: min(460px, calc(100vw - 24px));
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(36, 150, 237, 0.55);
+  background: rgba(10, 20, 36, 0.95);
+  color: #e9f3ff;
+  font-size: 9.5pt;
+  line-height: 1.2;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+  transition: opacity 0.16s ease, transform 0.16s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.link-status.is-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 @media print {
@@ -649,7 +723,8 @@ th {
     margin: 0;
   }
 
-  .toc-list a {
+  .toc-list a,
+  .toc-link {
     width: 100%;
     white-space: normal;
     border: 1px solid rgba(36, 150, 237, 0.28);
@@ -805,7 +880,21 @@ th {
         <nav class="sidebar" id="toc-sidebar">
             <h3>Table of Contents</h3>
             <ul class="toc-list">
-<li><a href="/docker/chapter_01.html">CHAPTER 1 — Why Docker? (The Mental Model)</a></li>
+<li><button class="toc-link" type="button" data-href="/docker/chapter_01.html">CHAPTER 1 — Why Docker? (The Mental Model)</button></li>
+<li><button class="toc-link" type="button" data-href="/docker/chapter_02.html">CHAPTER 2 — Installation & Setup</button></li>
+<li><button class="toc-link" type="button" data-href="/docker/chapter_03.html">CHAPTER 3 — Our First Container (Hands-On)</button></li>
+<li><button class="toc-link" type="button" data-href="/docker/chapter_04.html">CHAPTER 4 — Docker Images Deep Dive</button></li>
+<li><button class="toc-link" type="button" data-href="/docker/chapter_05.html">CHAPTER 5 — Writing Dockerfiles (The Core Skill)</button></li>
+<li><button class="toc-link" type="button" data-href="/docker/chapter_06.html">CHAPTER 6 — Multi-Stage Builds</button></li>
+<li><button class="toc-link" type="button" data-href="/docker/chapter_07.html">CHAPTER 7 — Volumes & Persistent Data</button></li>
+<li><button class="toc-link" type="button" data-href="/docker/chapter_08.html">CHAPTER 8 — Docker Networking</button></li>
+<li><button class="toc-link" type="button" data-href="/docker/chapter_09.html">CHAPTER 9 — Docker Compose (Multi-Container Apps)</button></li>
+<li><button class="toc-link" type="button" data-href="/docker/chapter_10.html">CHAPTER 10 — Development Workflow with Docker</button></li>
+<li><button class="toc-link" type="button" data-href="/docker/chapter_11.html">CHAPTER 11 — Docker Registry & Image Publishing</button></li>
+<li><button class="toc-link" type="button" data-href="/docker/chapter_12.html">CHAPTER 12 — Docker in CI/CD</button></li>
+<li><button class="toc-link" type="button" data-href="/docker/chapter_13.html">CHAPTER 13 — Performance, Size & Security</button></li>
+<li><button class="toc-link" type="button" data-href="/docker/chapter_14.html">CHAPTER 14 — Useful Patterns & Real-World Recipes</button></li>
+<li><button class="toc-link" type="button" data-href="/docker/chapter_15.html">CHAPTER 15 — Quick Reference & Cheat Sheet</button></li>
 </ul>
         </nav>
         <main class="content-wrapper">
@@ -815,13 +904,13 @@ th {
     <h2 style="margin-top: 0;">CHAPTER 1 — Why Docker? (The Mental Model)</h2>
 
     <h3>The "Works on My Machine" Problem</h3>
-    <p>Every developer has experienced this nightmare: You pull a repository from GitHub. You install the dependencies.
-        You run the app. It instantly crashes.</p>
-    <p>Your teammate looks at your screen and says, <em>"That's weird, it works perfectly on my machine."</em></p>
+    <p>Every developer has experienced this nightmare: We pull a repository from GitHub. We install the dependencies.
+        We run the app. It instantly crashes.</p>
+    <p>Our teammate looks at our screen and says, <em>"That's weird, it works perfectly on my machine."</em></p>
     <p>Why does this happen? Because modern applications are fragile. They depend on exact versions of Python, specific
-        system libraries, precise environment variables, and hidden background services. If your MacOS has Python 3.12
-        and your teammate's Ubuntu has Python 3.9, your code might break.</p>
-    <p><strong>Docker solves this permanently.</strong> It packages your code, the exact operating system, and all
+        system libraries, precise environment variables, and hidden background services. If our MacOS has Python 3.12
+        and our teammate's Ubuntu has Python 3.9, our code might break.</p>
+    <p><strong>Docker solves this permanently.</strong> It packages our code, the exact operating system, and all
         dependencies into a single, unbreakable box (a container) that behaves identically on a Macbook, a Windows
         desktop, and an AWS Linux server.</p>
 
@@ -830,21 +919,21 @@ th {
 
     <div class="plain-english-box">
         <strong>VMs vs Containers Analogy:</strong><br><br>
-        Imagine you want to rent an apartment.<br>
+        Imagine we want to rent an apartment.<br>
         <ul>
-            <li><strong>A Virtual Machine (VM)</strong> is like buying an entire empty house. You have to lay the
+            <li><strong>A Virtual Machine (VM)</strong> is like buying an entire empty house. We have to lay the
                 foundation, wire the electricity, install the plumbing, and buy the furniture. It's incredibly secure,
                 but it takes gigabytes of memory and minutes to boot up because it emulates a *whole computer hardware
                 system*.</li>
-            <li><strong>A Docker Container</strong> is like renting an apartment in a skyscraper. The building (your
-                laptop's OS kernel) already provides the plumbing and electricity. You just bring your furniture (your
+            <li><strong>A Docker Container</strong> is like renting an apartment in a skyscraper. The building (our
+                laptop's OS kernel) already provides the plumbing and electricity. We just bring our furniture (our
                 code). Because it shares the host's operating system, a container takes mere megabytes to run and boots
                 up in a fraction of a second.</li>
         </ul>
     </div>
 
     <h3>The Core Terminology</h3>
-    <p>Docker throws a lot of vocabulary at you. Here is exactly what everything means in simple English:</p>
+    <p>Docker throws a lot of vocabulary at us. Here is exactly what everything means in simple English:</p>
 
     <table class="reference-table">
         <tr>
@@ -855,25 +944,43 @@ th {
         <tr>
             <td><strong>Docker Engine / Daemon</strong></td>
             <td>The Engine Room</td>
-            <td>The invisible background service running on your laptop that actually builds and runs containers.</td>
+            <td>The invisible background service running on our laptop that actually builds and runs containers.</td>
         </tr>
         <tr>
             <td><strong>Dockerfile</strong></td>
             <td>The Recipe</td>
-            <td>A simple text file with step-by-step instructions on how to build your app (e.g., "Install Ubuntu,
-                install Node.js, copy my code").</td>
+            <td>A simple text file with step-by-step instructions on how to build our app (e.g., "Install Ubuntu,
+                install Node.js, copy our code").</td>
         </tr>
         <tr>
             <td><strong>Image</strong></td>
             <td>The Cake / Blueprint</td>
-            <td>A read-only, frozen snapshot built from your Dockerfile. It contains your OS, dependencies, and code,
+            <td>A read-only, frozen snapshot built from our Dockerfile. It contains our OS, dependencies, and code,
                 baked into one file.</td>
         </tr>
         <tr>
             <td><strong>Container</strong></td>
             <td>The Executable Instance</td>
-            <td>A live, running instance of an Image. You can run 10 identical containers from the exact same Image.
+            <td>A live, running instance of an Image. We can run 10 identical containers from the exact same Image.
             </td>
+        </tr>
+    </table>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 1</span>
+    </div>
+</div>
+
+<!-- Chapter 1 Page 2 -->
+<div class="page">
+    <div class="header">CHAPTER 1 — Why Docker?</div>
+
+    <table class="reference-table">
+        <tr>
+            <th>Term</th>
+            <th>The Real World Analogy</th>
+            <th>Technical Meaning</th>
         </tr>
         <tr>
             <td><strong>Volume</strong></td>
@@ -889,29 +996,30 @@ th {
     </table>
 
     <h3>The Developer Lifecycle</h3>
-    <p>When working with Docker, there are strictly four steps you will follow in a loop:</p>
+    <p>When working with Docker, there are strictly four steps we will follow in a loop:</p>
     <ol>
-        <li><code>docker build</code>: You write your code and a Dockerfile. You run build to bake it into an
-            <strong>Image</strong>.</li>
-        <li><code>docker push</code>: You upload that read-only Image to <strong>Docker Hub</strong>.</li>
-        <li><code>docker pull</code>: Your production server downloads the exact Image from the cloud.</li>
-        <li><code>docker run</code>: Your server sparks the Image into a live <strong>Container</strong>.</li>
+        <li><code>docker build</code>: We write our code and a Dockerfile. We run build to bake it into an
+            <strong>Image</strong>.
+        </li>
+        <li><code>docker push</code>: We upload that read-only Image to <strong>Docker Hub</strong>.</li>
+        <li><code>docker pull</code>: Our production server downloads the exact Image from the cloud.</li>
+        <li><code>docker run</code>: Our server sparks the Image into a live <strong>Container</strong>.</li>
     </ol>
 
     <div class="mistake-box">
         <strong>⚠️ Critical Developer Mistake:</strong><br>
         Beginners often SSH into a running container and use `nano` or `vim` to manually edit the code inside it to fix
         a bug. <strong>Never do this!</strong> Containers are "ephemeral"—they are purely temporary. The second the
-        container stops, your changes are permanently deleted. You must ALWAYS edit the code on your laptop, rebuild the
+        container stops, our changes are permanently deleted. We must ALWAYS edit the code on our laptop, rebuild the
         Image, and spin up a fresh container.
     </div>
 
     <div class="footer">
         <span>Docker Complete Handbook</span>
-        <span>Page 1</span>
+        <span>Page 2</span>
     </div>
 </div>
-            <div class="nav-buttons"><a href="/docker" class="nav-btn">← Cover</a><a href="#" class="nav-btn disabled">End of Handbook</a></div>
+            <div class="nav-buttons"><a href="/docker" class="nav-btn">← Cover</a><a href="/docker/chapter_02.html" class="nav-btn">Next →</a></div>
         </main>
     </div>
     <script src="/docker/script.js" defer></script>

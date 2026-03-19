@@ -1,0 +1,159 @@
+<div class="page" id="chapter-11">
+    <div class="header">CHAPTER 11 — Registry & Publishing</div>
+
+    <h2 style="margin-top: 0;">CHAPTER 11 — Docker Registry & Image Publishing</h2>
+
+    <h3>The Cloud Storage Mental Model</h3>
+    <p>Writing a Dockerfile and building an image locally is fantastic, but we eventually need to put that image on a
+        production server. We don't zip up the image and email it. We use a <strong>Registry</strong>.</p>
+    <p>A Registry is effectively an "App Store" or "GitHub" strictly for Docker images.</p>
+
+    <ul>
+        <li><strong>Public Repositories:</strong> Anyone in the world can <code>docker pull</code> our image without
+            logging in. Perfect for open-source tools (like Nginx or Ubuntu).</li>
+        <li><strong>Private Repositories:</strong> Requires explicit authentication via <code>docker login</code> with a
+            password or Personal Access Token (PAT). Essential for proprietary company code.</li>
+    </ul>
+
+    <h3>The Image Naming Convention</h3>
+    <p>Before we can push anything to the cloud, our image must follow a strict structural naming convention:</p>
+    <pre><code>registry_domain/username/repository_name:target_tag</code></pre>
+
+    <div class="usage-box">
+        <strong>Breaking down: <code>ghcr.io/microsoft/devcontainers:latest</code></strong><br><br>
+        <code>ghcr.io</code>: The server hosting the registry (GitHub). If missing, Docker assumes `docker.io` (Docker
+        Hub) by default.<br>
+        <code>microsoft</code>: The user or organization account that owns the repository.<br>
+        <code>devcontainers</code>: The specific application repository.<br>
+        <code>:latest</code>: The specific version tag.
+    </div>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 31</span>
+    </div>
+</div>
+
+<!-- Chapter 11 Page 2 -->
+<div class="page">
+    <div class="header">CHAPTER 11 — Registry & Publishing</div>
+
+    <h3>Real Example: Pushing to Docker Hub</h3>
+    <p>Let's walk through the exact steps a developer takes to publish an image to the default Docker Hub.</p>
+
+    <ol>
+        <li><strong>Authenticate:</strong> We must prove to the daemon who we are.
+            <pre><code>docker login
+# It will prompt for our Docker Hub username and password/PAT.</code></pre>
+        </li>
+        <li><strong>Build the Image:</strong> We build the code locally, assigning it a temporary name.
+            <pre><code>docker build -t my-app .</code></pre>
+        </li>
+        <li><strong>Retag the Image:</strong> We MUST tag the image to match our exact Docker Hub username, otherwise
+            the upload will be rejected for lack of permission. Let's assume our username is `cooldev`.
+            <pre><code># docker tag [SOURCE_IMAGE] [TARGET_NAME]
+docker tag my-app cooldev/my-app:v1.0</code></pre>
+        </li>
+        <li><strong>Push the Image:</strong> We upload the newly tagged blueprint to the cloud.
+            <pre><code>docker push cooldev/my-app:v1.0</code></pre>
+        </li>
+    </ol>
+    <p>Our production server can now easily download this image across the world by running
+        <code>docker pull cooldev/my-app:v1.0</code>.</p>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 32</span>
+    </div>
+</div>
+
+<!-- Chapter 11 Page 3 -->
+<div class="page">
+    <div class="header">CHAPTER 11 — Registry & Publishing</div>
+
+    <h3>GitHub Container Registry (ghcr.io)</h3>
+    <p>Docker Hub is perfectly fine, but many teams already have their code sitting in GitHub. GitHub offers its own
+        highly-integrated registry named GHCR.</p>
+
+    <pre><code># 1. Create a Personal Access Token (PAT) on GitHub
+# It MUST have 'read:packages' and 'write:packages' scopes.
+
+# 2. Login to the specific GitHub registry domain
+echo $MY_GITHUB_PAT | docker login ghcr.io -u my_github_username --password-stdin
+
+# 3. Tag exactly by prepending the domain
+docker tag my-app ghcr.io/my_github_org/my-app:v1.0
+
+# 4. Push to GitHub
+docker push ghcr.io/my_github_org/my-app:v1.0</code></pre>
+
+    <h3>Hosting Our Own Private Registry</h3>
+    <p>If our company has extreme "air-gapped" security requirements where code cannot touch the internet, we can
+        actually spin up an entire Docker Registry locally <em>using Docker itself</em>.</p>
+
+    <pre><code># Run the official, isolated local registry on port 5000
+docker run -d -p 5000:5000 --name local-registry registry:2</code></pre>
+    <p>We can now tag and push deeply sensitive proprietary images directly to
+        <code>localhost:5000/top_secret_app:v1</code>.</p>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 33</span>
+    </div>
+</div>
+
+<!-- Chapter 11 Page 4 -->
+<div class="page">
+    <div class="header">CHAPTER 11 — Registry & Publishing</div>
+
+    <h3>Automating Builds (GitHub Actions)</h3>
+    <p>We never want a human manually typing <code>docker push</code> from their laptop in production. Laptops have
+        dirty states and uncommitted files. A true Senior Developer offloads this entirely to a CI/CD pipeline.</p>
+
+    <p>When we push code to the `main` branch, we want GitHub Actions to automatically securely build and push our final
+        production image to GHCR.</p>
+
+    <pre><code># .github/workflows/docker-publish.yml
+name: Build and Publish
+
+on:
+  push:
+    branches: [ "main" ] # Trigger specifically on main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/${{ github.repository }}:latest</code></pre>
+
+    <div class="mistake-box">
+        <strong>⚠️ CI/CD Security Tip:</strong><br>
+        Notice that we never hardcoded passwords in that YAML file. The <code>${{ secrets.GITHUB_TOKEN }}</code> is an
+        ephemeral, auto-generated token created by GitHub specifically for that single workflow run. It is the absolute
+        safest way to authenticate our automated builders.
+    </div>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 34</span>
+    </div>
+</div>

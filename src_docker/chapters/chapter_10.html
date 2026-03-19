@@ -1,0 +1,162 @@
+<div class="page" id="chapter-10">
+    <div class="header">CHAPTER 10 — Development Workflow</div>
+
+    <h2 style="margin-top: 0;">CHAPTER 10 — Development Workflow with Docker</h2>
+
+    <h3>The Right Mental Model</h3>
+    <p>Using Docker in production is easy: Build an image, run the container. But using Docker for everyday local
+        development confuses many developers. "Do I have to rebuild my image every time I save a file?" The answer is
+        <strong>absolutely not</strong>.</p>
+    <p>Our local dev mental model is this: <strong>The container provides the raw runtime environment (Python, Node,
+            libraries). Our laptop provides the source code.</strong> We glue them together using Bind Mounts.</p>
+
+    <h3>Hot Reloading (Nodemon / Uvicorn)</h3>
+    <p>To achieve instantaneous development feedback, we start our framework using its native hot-reloading tool, but we
+        do it <em>inside the container</em>.</p>
+    <pre><code># docker-compose.override.yml
+services:
+  api:
+    build: .
+    # 1. Mount our local laptop folder into the container's /app dir
+    volumes:
+      - ./:/app
+    
+    # 2. Tell the framework to watch the /app dir for changes
+    # For Python: command: ["uvicorn", "main:app", "--reload", "--host", "0.0.0.0"]
+    # For Node:   command: ["nodemon", "server.js"]
+    command: ["uvicorn", "main:app", "--reload", "--host", "0.0.0.0"]</code></pre>
+    <p>When we hit `CTRL+S` in our IDE, the file physically saves on our laptop. The Bind Mount instantly mirrors that
+        file change into the container. `uvicorn` detects the change and aggressively restarts the web server. We get
+        sub-second recompiles without ever running `docker build`.</p>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 27</span>
+    </div>
+</div>
+
+<!-- Chapter 10 Page 2 -->
+<div class="page">
+    <div class="header">CHAPTER 10 — Development Workflow</div>
+
+    <h3>Targeting Dev vs. Prod Stages</h3>
+    <p>If our workflow requires development linters, testing suites, or hot-reload utilities, we should NOT bake those
+        tools into our final production image. We use Multi-Stage builds with the magical <code>target</code> attribute.
+    </p>
+
+    <pre><code># Dockerfile
+FROM python:3.11 AS base
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+# --- DEV STAGE ---
+FROM base AS dev
+RUN pip install pytest black flake8
+COPY . .
+# We don't define a CMD here. Compose will override it!
+
+# --- PROD STAGE ---
+FROM base AS prod
+COPY . .
+CMD ["gunicorn", "-w", "4", "main:app"]</code></pre>
+
+    <p>In our `docker-compose.override.yml` (our local machine), we explicitly tell Compose to stop building at the
+        `dev` stage:</p>
+    <pre><code># docker-compose.override.yml
+services:
+  api:
+    build:
+      context: .
+      target: dev # Docker stops reading the Dockerfile after the `dev` stage!</code></pre>
+
+    <h3>Managing Secrets Locally</h3>
+    <p>We never hardcode secrets (like AWS keys) in our Dockerfiles. Locally, we create a raw text file named
+        <code>.env</code> in our project root containing our passwords. We then hook this file into our Compose setup
+        using the <code>env_file:</code> directive. We must <strong>always</strong> add `.env` to our `.gitignore`
+        immediately, otherwise we might automatically publish our secure database credentials to GitHub!</p>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 28</span>
+    </div>
+</div>
+
+<!-- Chapter 10 Page 3 -->
+<div class="page">
+    <div class="header">CHAPTER 10 — Development Workflow</div>
+
+    <h3>Debugging & Logs</h3>
+    <p>When things break, we don't SSH into containers like they are virtual machines. We use native Docker
+        introspection.</p>
+
+    <div class="usage-box">
+        <code>docker logs -f my_container</code><br>
+        The <code>-f</code> (follow) flag locks onto the container's standard output. It acts identical to tailing a log
+        file, streaming all print statements to our terminal in real-time.<br><br>
+        <code>docker exec -it my_container bash</code><br>
+        "Execute Interactive TTY". This safely drops us into a root bash shell <em>inside</em> the running container. We
+        use this to verify if our files actually mounted, or to manually ping the database from the inside.
+    </div>
+
+    <h3>VS Code Dev Containers</h3>
+    <p>If our entire team uses VS Code, we can eliminate the "Works on my machine" problem entirely by developing
+        <em>directly inside a container</em>. </p>
+
+    <p>Instead of mapping files from our laptop to the container, the <strong>Dev Containers</strong> extension
+        literally injects genuine VS Code language servers, linters, and debuggers directly into a running Docker
+        container.</p>
+
+    <ol>
+        <li>We create a <code>.devcontainer/devcontainer.json</code> file in our repository.</li>
+        <li>When a new developer opens the project, VS Code immediately asks: "Reopen in Container?"</li>
+        <li>VS Code quietly boots the Docker image in the background and connects our local editor window to it via a
+            localized SSH socket.</li>
+    </ol>
+    <p>Our laptop technically doesn't even need Python or Node.js installed locally anymore. We just need Docker and VS
+        Code.</p>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 29</span>
+    </div>
+</div>
+
+<!-- Chapter 10 Page 4 -->
+<div class="page">
+    <div class="header">CHAPTER 10 — Development Workflow</div>
+
+    <h3>Makefile Shortcut Patterns</h3>
+    <p>Typing out massive Compose commands all day is tedious. A true Senior Developer creates a <code>Makefile</code>
+        in the root of the project to standardize interactions for everyone.</p>
+
+    <pre><code># Makefile
+.PHONY: up down logs shell
+
+up:
+	docker compose up -d --build
+
+down:
+	docker compose down -v
+
+logs:
+	docker compose logs -f api
+
+shell:
+	docker compose exec api bash</code></pre>
+
+    <div class="plain-english-box">
+        <strong>The Developer Reality:</strong><br>
+        Now, when a brand new Junior Developer joins our team, we give them exactly two commands on their first
+        day:<br><br>
+        <code>git clone</code><br>
+        <code>make up</code><br><br>
+        Within 30 seconds, they have our entire production-grade microservice architecture logically running on their
+        local machine, automatically loaded with test data. That is the true superpower of Docker.
+    </div>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 30</span>
+    </div>
+</div>

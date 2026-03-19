@@ -1,0 +1,152 @@
+<div class="page" id="chapter-12">
+    <div class="header">CHAPTER 12 — Docker in CI/CD</div>
+
+    <h2 style="margin-top: 0;">CHAPTER 12 — Docker in CI/CD</h2>
+
+    <h3>Why Docker in CI? (Reproducibility)</h3>
+    <p>Continuous Integration (CI) servers execute our automated tests. If our tests rely on the CI server having
+        exactly Python 3.11 and Postgres 15 installed globally, our tests will eventually break. A pipeline that passes
+        today might fail tomorrow just because the CI runner auto-updated its global Python version.</p>
+
+    <div class="plain-english-box">
+        <strong>The Goal:</strong><br>
+        We want 100% Hermetic Reproducibility. We package everything inside a Docker container, run our tests
+        <em>inside</em> that exact container, and if it passes, we push that <em>exact identical container</em> to
+        production. We test the exact identical artifact we plan to ship.
+    </div>
+
+    <h3>The Common Pattern</h3>
+    <p>A Senior Developer's CI/CD pipeline looks like exactly this on every Pull Request:</p>
+    <ol>
+        <li><strong>Build:</strong> Construct the Docker Image dynamically in the CI runner.</li>
+        <li><strong>Test:</strong> Run our unit tests entirely inside the newly built ephemeral container.</li>
+        <li><strong>Push:</strong> If (and only if) the PR is safely merged to `main`, tag the image as `latest` and
+            push it to our Cloud Registry.</li>
+    </ol>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 35</span>
+    </div>
+</div>
+
+<!-- Chapter 12 Page 2 -->
+<div class="page">
+    <div class="header">CHAPTER 12 — Docker in CI/CD</div>
+
+    <h3>GitHub Actions: Caching Layers</h3>
+    <p>GitHub Actions runners boot up completely fresh and naked every single time. This means we instantly lose all of
+        our powerful Docker Layer Caching (which makes builds fast). If we don't fix this, a 5-second build on our
+        laptop will brutally take 5-10 minutes in CI.</p>
+
+    <p>We fix this by using the `cache-from` and `cache-to` flags, completely offloading our Docker layer cache directly
+        to GitHub's internal fast-cache storage API.</p>
+
+    <pre><code># .github/workflows/ci.yml
+steps:
+  - name: Set up Docker Buildx
+    uses: docker/setup-buildx-action@v3
+
+  - name: Build and Export Cache
+    uses: docker/build-push-action@v5
+    with:
+      context: .
+      # Don't push yet! Wait for tests to pass.
+      push: false
+      load: true 
+      tags: my-app:test
+      # Automatically pull/push layers to GitHub's Cache API
+      cache-from: type=gha
+      cache-to: type=gha,mode=max
+
+  - name: Run Tests Inside Container
+    run: |
+      docker run --rm my-app:test pytest /app/tests</code></pre>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 36</span>
+    </div>
+</div>
+
+<!-- Chapter 12 Page 3 -->
+<div class="page">
+    <div class="header">CHAPTER 12 — Docker in CI/CD</div>
+
+    <h3>GitLab CI: DinD vs Socket Mounting</h3>
+    <p>If we use GitLab CI, the CI runner itself is natively executing <em>inside</em> a Docker container. This creates
+        a deeply confusing "Inception" scenario: How do we run Docker commands inside a Docker container?</p>
+
+    <table class="reference-table">
+        <tr>
+            <th>Strategy</th>
+            <th>How It Works</th>
+            <th>Pros / Cons</th>
+        </tr>
+        <tr>
+            <td><strong>Socket Mounting</strong></td>
+            <td>We inject the Host server's literal <code>/var/run/docker.sock</code> file directly inside the CI
+                container as a Bind Mount.</td>
+            <td><strong>Pro:</strong> Blazing fast. Best for layer caching.<br><strong>Con:</strong> Severe security
+                risk. The CI container gets root access to the host server.</td>
+        </tr>
+        <tr>
+            <td><strong>Docker-in-Docker (DinD)</strong></td>
+            <td>We run an entire isolated, nested Docker Daemon runtime literally inside the CI container. (The
+                <code>docker:dind</code> secondary service).</td>
+            <td><strong>Pro:</strong> Highly secure isolation.<br><strong>Con:</strong> Slower. Destroys layer caching
+                because the nested daemon shuts down permanently after the pipeline finishes.</td>
+        </tr>
+    </table>
+
+    <pre><code># .gitlab-ci.yml (DinD Example)
+test_job:
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+  script:
+    - docker build -t my-app .
+    - docker run --rm my-app npm test</code></pre>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 37</span>
+    </div>
+</div>
+
+<!-- Chapter 12 Page 4 -->
+<div class="page">
+    <div class="header">CHAPTER 12 — Docker in CI/CD</div>
+
+    <h3>Integration Testing with Compose</h3>
+    <p>Unit tests are great, but what if our code requires an actual working PostgreSQL database and Redis cluster to
+        pass its tests? We literally spin up our entire <code>docker-compose.yml</code> inside the CI pipeline.</p>
+
+    <pre><code># Inside our CI workflow bash script
+
+# 1. Boot up the entire architecture in the background
+$ docker compose up -d
+
+# 2. Wait exactly 5 seconds for the database to boot and accept connections
+$ sleep 5
+
+# 3. Aggressively execute our integration tests inside the running API container
+$ docker compose exec -T api pytest /app/tests/integration
+
+# 4. Tear the entire infrastructure down and destroy the ephemeral database
+$ docker compose down -v</code></pre>
+
+    <div class="mistake-box">
+        <strong>⚠️ CI TTY Error:</strong><br>
+        Notice we used <code>exec -T</code> in the script instead of our usual <code>exec -it</code>. CI servers do not
+        have physical keyboards or interactive terminal drivers. Using <code>-it</code> in a GitHub Action will crash
+        immediately with a "the input device is not a TTY" error.
+    </div>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 38</span>
+    </div>
+</div>

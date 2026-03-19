@@ -1,0 +1,180 @@
+<div class="page" id="chapter-15">
+    <div class="header">CHAPTER 15 — Quick Reference</div>
+
+    <h2 style="margin-top: 0;">CHAPTER 15 — Quick Reference & Cheat Sheet</h2>
+
+    <h3>Essential Docker CLI Commands</h3>
+    <table class="reference-table">
+        <tr>
+            <th>Command</th>
+            <th>What it does</th>
+        </tr>
+        <tr>
+            <td><code>docker run -d -p 80:80 my-app</code></td>
+            <td>Starts a container detached, publishing port 80 to the host.</td>
+        </tr>
+        <tr>
+            <td><code>docker ps / docker ps -a</code></td>
+            <td>Lists all running containers / Lists every container (even stopped ones).</td>
+        </tr>
+        <tr>
+            <td><code>docker stop &lt;id&gt; / rm &lt;id&gt;</code></td>
+            <td>Gracefully shuts down a container / Permanently deletes a stopped container.</td>
+        </tr>
+        <tr>
+            <td><code>docker exec -it &lt;id&gt; bash</code></td>
+            <td>Opens an interactive bash terminal directly inside a running container.</td>
+        </tr>
+        <tr>
+            <td><code>docker logs -f &lt;id&gt;</code></td>
+            <td>Streams the container's standard output (console logs) in real-time.</td>
+        </tr>
+        <tr>
+            <td><code>docker build -t my-app .</code></td>
+            <td>Builds an image from the <code>Dockerfile</code> in the current directory and tags it.</td>
+        </tr>
+        <tr>
+            <td><code>docker images / rmi &lt;name&gt;</code></td>
+            <td>Lists all locally cached images / Deletes a specific image from our hard drive.</td>
+        </tr>
+        <tr>
+            <td><code>docker network ls</code></td>
+            <td>Lists all virtual networks bridging our containers together.</td>
+        </tr>
+    </table>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 47</span>
+    </div>
+</div>
+
+<!-- Chapter 15 Page 2 -->
+<div class="page">
+    <div class="header">CHAPTER 15 — Quick Reference</div>
+
+    <h3>Dockerfile Instruction Cheat Sheet</h3>
+    <table class="reference-table">
+        <tr>
+            <th>Instruction</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><strong>FROM</strong></td>
+            <td>Defines the base image (e.g., <code>FROM python:3.11-slim</code>). Must be first.</td>
+        </tr>
+        <tr>
+            <td><strong>WORKDIR</strong></td>
+            <td>Creates and enters a directory. All subsequent commands run from here.</td>
+        </tr>
+        <tr>
+            <td><strong>COPY / ADD</strong></td>
+            <td>Copies files from our laptop into the image. (`COPY` is preferred over `ADD`).</td>
+        </tr>
+        <tr>
+            <td><strong>RUN</strong></td>
+            <td>Executes a bash command <em>during the build phase</em> (e.g., `npm install`).</td>
+        </tr>
+        <tr>
+            <td><strong>ENV / ARG</strong></td>
+            <td>Sets environment variables. (`ENV` persists at runtime, `ARG` is only for building).</td>
+        </tr>
+        <tr>
+            <td><strong>USER</strong></td>
+            <td>Switches the executing user away from default `root` for security.</td>
+        </tr>
+        <tr>
+            <td><strong>CMD / ENTRYPOINT</strong></td>
+            <td>The final command that executes when the container actually <em>boots up</em>.</td>
+        </tr>
+    </table>
+
+    <h3>Docker Compose Cheat Sheet</h3>
+    <div class="usage-box">
+        <code>docker compose up -d --build</code><br>
+        Forces a fresh rebuild of our Dockerfiles, then starts the entire network in the background.<br><br>
+        <code>docker compose down -v</code><br>
+        Tears down all containers and networks, and uses <code>-v</code> to securely wipe all attached nameless
+        volumes.<br><br>
+        <code>docker compose logs -f api</code><br>
+        Follows the real-time logs specifically for the service named `api`.
+    </div>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 48</span>
+    </div>
+</div>
+
+<!-- Chapter 15 Page 3 -->
+<div class="page">
+    <div class="header">CHAPTER 15 — Quick Reference</div>
+
+    <h3>Debugging Common Errors</h3>
+
+    <h4>1. "bind: address already in use"</h4>
+    <p><strong>The Error:</strong> Something on our laptop is already using the port we tried to publish via
+        <code>-p 8080:8000</code>.</p>
+    <p><strong>The Fix:</strong> We either stop the rogue local service (maybe another container is still running), or
+        simply change our host port parameter to <code>-p 8081:8000</code>.</p>
+
+    <h4>2. "no space left on device"</h4>
+    <p><strong>The Error:</strong> Docker has completely filled our laptop's hard drive with unused gigabyte-heavy
+        images and dead containers.</p>
+    <p><strong>The Fix:</strong> We must aggressively prune the Docker Daemon's cache. (See next page for the ultimate
+        cleanup command).</p>
+
+    <h4>3. "permission denied (bind mount)"</h4>
+    <p><strong>The Error:</strong> Our container is trying to write to a bind-mounted folder (e.g., logging to
+        `./logs`), but the Host OS (Mac/Linux) is blocking the container's internal non-root user.</p>
+    <p><strong>The Fix:</strong> We make sure the folder on our laptop has appropriate wide-open write permissions
+        (<code>chmod 777 ./logs</code> for local dev), or we configure User Namespace Remapping.</p>
+
+    <h4>4. "image my-app:latest not found"</h4>
+    <p><strong>The Error:</strong> We told Docker Compose to boot `image: my-app`, but we haven't actually built it yet,
+        and Docker Hub definitely doesn't host our private app.</p>
+    <p><strong>The Fix:</strong> We must explicitly run <code>docker compose build</code>, OR we must add a
+        <code>build: .</code> block underneath the `image:` block so Compose knows how to build it automatically.</p>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 49</span>
+    </div>
+</div>
+
+<!-- Chapter 15 Page 4 -->
+<div class="page">
+    <div class="header">CHAPTER 15 — Quick Reference</div>
+
+    <h4>5. "network not found"</h4>
+    <p><strong>The Error:</strong> We ran `docker run --network my_net`, but Docker throws a fatal error because the
+        custom network doesn't physically exist.</p>
+    <p><strong>The Fix:</strong> When running independent containers, we must manually run
+        <code>docker network create my_net</code> first. (Remember, Docker Compose handles this automatically, but plain
+        `docker run` does not).</p>
+
+    <h3>The Ultimate System Cleanup</h3>
+    <p>Over months of development, Docker endlessly hoards old images, dangling build caches, stopped containers, and
+        orphaned volumes. This can easily consume 50GB to 100GB of our laptop's SSD.</p>
+
+    <p>When our system is bloated or corrupted, we drop the nuclear bomb to completely reset our environment to a
+        pristine state:</p>
+
+    <div class="usage-box" style="text-align: center; padding: 25px;">
+        <code style="font-size: 1.2rem; color: #ff5555;">docker system prune --all --volumes</code>
+    </div>
+
+    <p style="text-align: center; margin-top: 20px;"><strong>Warning:</strong> This permanently deletes ALL stopped
+        containers, ALL unused virtual networks, ALL unattached images, and ALL dangling volumes. It is completely
+        unrecoverable. But it almost always fixes the hardest hidden caching bugs.</p>
+
+    <div class="mistake-box" style="margin-top: 40px; text-align: center;">
+        <strong>Handbook Complete.</strong><br>
+        We are now ready to containerize the world.
+    </div>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 50</span>
+    </div>
+</div>

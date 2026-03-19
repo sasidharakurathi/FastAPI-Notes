@@ -1,0 +1,150 @@
+<div class="page" id="chapter-07">
+    <div class="header">CHAPTER 7 — Volumes & Persistent Data</div>
+
+    <h2 style="margin-top: 0;">CHAPTER 7 — Volumes & Persistent Data</h2>
+
+    <h3>The Problem: Containers are Ephemeral</h3>
+    <p>By default, everything created inside a container is strictly temporary. If our app writes a log file or a user
+        uploads an image, it is saved on the container's writable "top layer". When we type <code>docker rm</code>, the
+        entire container is permanently deleted along with all its data.</p>
+    <p>We need a way to outlive the specific running container, especially for databases. This is where
+        <strong>Volumes</strong> come in.
+    </p>
+
+    <h3>The Three Types of Mounts</h3>
+    <table class="reference-table">
+        <tr>
+            <th>Type</th>
+            <th>What it is</th>
+            <th>When we use it</th>
+        </tr>
+        <tr>
+            <td><strong>Named Volumes</strong></td>
+            <td>Docker creates a fully managed folder hidden deep inside our host's OS. Docker exclusively handles it.
+            </td>
+            <td>Databases, stateful data, or when we don't care <em>where</em> the data is stored physically, we just
+                want it saved safely.</td>
+        </tr>
+        <tr>
+            <td><strong>Bind Mounts</strong></td>
+            <td>We actively attach a specific folder on our laptop (e.g., `/Users/dev/my_code`) into the container.</td>
+            <td>Local development! We want real-time syncing so when we edit code in VS Code, the container instantly
+                sees it.</td>
+        </tr>
+        <tr>
+            <td><strong>tmpfs Mounts</strong></td>
+            <td>Data is stored directly in RAM. It never touches our physical hard drive.</td>
+            <td>High-security applications where we never want sensitive API secrets to touch disk.</td>
+        </tr>
+    </table>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 17</span>
+    </div>
+</div>
+
+<!-- Chapter 7 Page 2 -->
+<div class="page">
+    <div class="header">CHAPTER 7 — Volumes & Persistent Data</div>
+
+    <h3>Volume Management Commands</h3>
+    <p>Because Named Volumes are treated as first-class objects in Docker, we manage them directly via the CLI:</p>
+
+    <div class="usage-box">
+        <code>docker volume create pg_data</code><br>
+        Creates an empty named volume ready to be attached.<br><br>
+        <code>docker volume ls</code><br>
+        Lists all the volumes Docker is currently keeping alive on our machine.<br><br>
+        <code>docker volume inspect pg_data</code><br>
+        Tells us the exact raw file path where our data is actually living on the host.<br><br>
+        <code>docker volume rm pg_data</code><br>
+        Permanently deletes the volume. (Only works if no containers are currently attached to it).
+    </div>
+
+    <h3>The Great Debate: -v vs --mount</h3>
+    <p>When running a container, we have two ways to attach a volume. Historically we used <code>-v</code>, but Docker
+        now strongly recommends <code>--mount</code> because it is significantly clearer to read.</p>
+
+    <pre><code># The old, short way (-v)
+docker run -v my_volume:/app/data my_app
+
+# The modern, explicit way (--mount)
+docker run --mount type=volume,source=my_volume,target=/app/data my_app</code></pre>
+
+    <div class="plain-english-box">
+        <strong>Why use <code>--mount</code>?</strong><br>
+        If we accidentally misspell our volume name using <code>-v</code>, Docker quietly creates a brand new, empty,
+        unused volume on our host disk automatically. It doesn't tell us, leading to confusing blank databases. If we do
+        that with <code>--mount</code>, Docker will instantly throw an error and stop safely.
+    </div>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 18</span>
+    </div>
+</div>
+
+<!-- Chapter 7 Page 3 -->
+<div class="page">
+    <div class="header">CHAPTER 7 — Volumes & Persistent Data</div>
+
+    <h3>Real Example 1: PostgreSQL with a Named Volume</h3>
+    <p>If we try to run a database without a volume, the second the container stops, our entire database vanishes. Let's
+        fix that by attaching a Named Volume so our user table survives a restart.</p>
+
+    <pre><code># 1. Create the persistent volume explicitly
+docker volume create my_db_data
+
+# 2. Run Postgres and map the volume to its expected data directory
+docker run -d \
+  --name my_postgres \
+  -e POSTGRES_PASSWORD=secret \
+  --mount type=volume,source=my_db_data,target=/var/lib/postgresql/data \
+  postgres:15-alpine</code></pre>
+    <p>Now, even if we run <code>docker stop my_postgres &amp;&amp; docker rm my_postgres</code>, the moment we spin it
+        back up using the exact same volume mount command, all our tables and rows will still be there waiting for us to
+        use!</p>
+
+    <h3>Real Example 2: Live Code Reload (Dev Workflow)</h3>
+    <p>When developing locally, we don't want to wait 60 seconds to rebuild a Docker image just because we changed a
+        single <code>&lt;h1&gt;</code> tag in our code. We use a <strong>Bind Mount</strong> to transparently project
+        our live code folder directly into the container.</p>
+
+    <pre><code># We are inside our project folder where our 'server.js' lives.
+# We mount our current directory ($PWD) directly into the image's /app folder.
+
+docker run -d \
+  --name dev_server \
+  -p 3000:3000 \
+  --mount type=bind,source="$(pwd)",target=/app \
+  my_node_app npm run dev</code></pre>
+
+    <div class="mistake-box">
+        <strong>⚠️ Warning: The <code>node_modules</code> Overwrite</strong><br>
+        If we bind mount our entire laptop's folder into a Node.js container, our local MacOS/Windows
+        <code>node_modules</code> folder will violently overwrite the Linux <code>node_modules</code> folder compiled
+        inside the container, likely breaking native C++ bindings (like bcrypt or sass).
+    </div>
+
+    <h3>Summary: When to Use Which Type?</h3>
+    <p>To wrap up this chapter, here is the golden rule for choosing volume types:</p>
+    <ul>
+        <li><strong>Use Named Volumes for Production Data:</strong> If we are capturing database state, cache files, or
+            media uploads, we want Docker to securely manage them. Named volumes are easier to back up, share among
+            containers, and they guarantee high Linux filesystem performance.</li>
+        <li><strong>Use Bind Mounts for Local Development:</strong> If we want our IDE (like VS Code) edits to be
+            immediately reflected inside the running container without rebuilding the image, we must use a bind mount.
+            <em>Never use a bind mount in production.</em>
+        </li>
+        <li><strong>Use tmpfs for In-Memory Secrets:</strong> If our application generates highly sensitive temporary
+            keys, passwords, or cryptographic tokens, we write them to a `tmpfs` mount so no attacker can ever recover
+            them from our hard drives after the container dies.</li>
+    </ul>
+
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 19</span>
+    </div>
+</div>

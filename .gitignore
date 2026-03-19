@@ -1,4 +1,5 @@
 .vscode/
 __pycache__/
-fastapi/
-docker/
+/fastapi/
+/docker/
+/index.html

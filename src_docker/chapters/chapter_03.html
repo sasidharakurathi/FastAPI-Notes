@@ -1,0 +1,152 @@
+<div class="page" id="chapter-03">
+    <div class="header">CHAPTER 3 — Our First Container (Hands-On)</div>
+
+    <h2 style="margin-top: 0;">CHAPTER 3 — Our First Container (Hands-On)</h2>
+
+    <h3>The Famous "Hello World"</h3>
+    <p>Let's run our very first container. We open our terminal and type exactly this:</p>
+    <pre><code>docker run hello-world</code></pre>
+
+    <p>Here is what happens behind the scenes in milliseconds:</p>
+    <ol>
+        <li>The Docker Client asks our local daemon to run the `hello-world` image.</li>
+        <li>The daemon checks our laptop's local cache. It initially does not find it.</li>
+        <li>The daemon automatically connects to Docker Hub (the cloud registry) and natively pulls the image down.</li>
+        <li>The daemon sparks up the container, runs the tiny "hello" code inside it, streams the output to our
+            terminal, and immediately stops the container.</li>
+    </ol>
+
+    <h3>Interactive Containers (-it)</h3>
+    <p>Running a single command is cool, but what if we just want to "be" inside a Linux machine? This is where the
+        interactive flags come in.</p>
+    <pre><code>docker run -it ubuntu bash</code></pre>
+
+    <div class="plain-english-box">
+        <strong>What's happening here?</strong><br><br>
+        <code>-i</code> (Interactive): Tells Docker to keep the STDIN pipe open so we can type.<br>
+        <code>-t</code> (TTY): Allocates a pseudo-TTY (gives us a working terminal cursor).<br>
+        <code>ubuntu</code>: The exact image we are booting.<br>
+        <code>bash</code>: The command we want to run the <em>second</em> the container wakes up.
+    </div>
+    <p>Our terminal prompt will instantly change. We are now the `root` user inside an isolated, bare-bones Ubuntu
+        container on our machine!</p>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 5</span>
+    </div>
+</div>
+
+<!-- Chapter 3 Page 2 -->
+<div class="page">
+    <div class="header">CHAPTER 3 — Our First Container (Hands-On)</div>
+
+    <h3>Lifecycle Commands: ps, stop, start, rm</h3>
+    <p>To control the thousands of containers we will eventually build, we need specific daemon commands.</p>
+
+    <div class="usage-box">
+        <code>docker ps</code><br>
+        Lists <strong>only</strong> the containers that are actively running right now. (Similar to the Linux `ps`
+        command).<br><br>
+        <code>docker ps -a</code><br>
+        Lists <strong>ALL</strong> containers, including stopped, dead, or crashed ones.
+    </div>
+
+    <pre><code># Gracefully stop a running container
+docker stop &lt;container_id&gt;
+
+# Wake up a previously stopped container
+docker start &lt;container_id&gt;
+
+# Completely delete the container off our hard drive
+docker rm &lt;container_id&gt;</code></pre>
+
+    <div class="mistake-box">
+        <strong>⚠️ Warning: Orphaned Containers!</strong><br>
+        Every time we type `docker run`, Docker creates a brand new container instance. If we run a container 10 times,
+        we spin up 10 containers. When they stop, they sit there dead on our hard drive, slowly eating up gigabytes of
+        space. We must actively `docker rm` them or use the `--rm` flag (below).
+    </div>
+
+    <h3>The 6 Sacred Flags of `docker run`</h3>
+    <p>Every developer memorizes these six flags. We combine them to shape exactly how our container behaves.</p>
+
+    <table class="reference-table">
+        <tr>
+            <th>Flag</th>
+            <th>Name</th>
+            <th>Plain English Meaning</th>
+        </tr>
+        <tr>
+            <td><code>-d</code></td>
+            <td>Detached</td>
+            <td>Runs the container secretly in the background so it doesn't lock up our terminal cursor.</td>
+        </tr>
+        <tr>
+            <td><code>-p 8080:80</code></td>
+            <td>Publish (Ports)</td>
+            <td>"Map port 8080 on our laptop, straight through the wall, to port 80 inside the container."</td>
+        </tr>
+        <tr>
+            <td><code>-v /home:/app</code></td>
+            <td>Volume</td>
+            <td>"Mount our laptop's `/home` folder directly into the container's `/app` folder." (Live syncs files).
+            </td>
+        </tr>
+        <tr>
+            <td><code>-e KEY=val</code></td>
+            <td>Environment</td>
+            <td>Injects a secret environment variable (like a Database URL or API Key) into the container on boot.</td>
+        </tr>
+        <tr>
+            <td><code>--name my_app</code></td>
+            <td>Name</td>
+            <td>Gives the container a human-readable name so we don't have to target random IDs like `a8e914023x`.</td>
+        </tr>
+        <tr>
+            <td><code>--rm</code></td>
+            <td>Remove</td>
+            <td><strong>Auto-destruct!</strong> The exact second the container stops, instantly delete it to save disk
+                space.</td>
+        </tr>
+    </table>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 6</span>
+    </div>
+</div>
+
+<!-- Chapter 3 Page 3 -->
+<div class="page">
+    <div class="header">CHAPTER 3 — Our First Container (Hands-On)</div>
+
+    <h3>Real Example: Running Nginx Locally</h3>
+    <p>Let's immediately apply the six sacred flags to run something highly practical. Nginx is the world's most popular
+        web server. Let's host it in 5 seconds without installing anything on our host machine.</p>
+
+    <pre><code>docker run --rm -d --name local-web -p 8080:80 nginx</code></pre>
+
+    <p>Let's map out exactly what we just commanded the daemon to do:</p>
+    <ul>
+        <li><code>--rm</code>: When we kill this web server later, permanently delete the container instance.</li>
+        <li><code>-d</code>: Run the web server in the background so we can keep typing in this terminal tab.</li>
+        <li><code>--name local-web</code>: Call it 'local-web' so it's easy to stop later.</li>
+        <li><code>-p 8080:80</code>: If we go to localhost:8080 on our laptop's browser, forward our traffic right into
+            port 80 of the Nginx container.</li>
+        <li><code>nginx</code>: Download the official Nginx image from the cloud.</li>
+    </ul>
+
+    <p>We open our normal web browser and navigate to <strong>http://localhost:8080</strong>.<br>
+        We will instantly see the "Welcome to nginx!" splash page.</p>
+
+    <p>When we are done testing our proxy logic, we tear down the container instantly by typing:</p>
+    <pre><code>docker stop local-web</code></pre>
+    <p>Because we used the <code>--rm</code> flag earlier, stopping it also automatically triggered its deletion. Zero
+        mess left on our laptop!</p>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 7</span>
+    </div>
+</div>

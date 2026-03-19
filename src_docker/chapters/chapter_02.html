@@ -1,0 +1,116 @@
+<div class="page" id="chapter-02">
+    <div class="header">CHAPTER 2 — Installation & Setup</div>
+
+    <h2 style="margin-top: 0;">CHAPTER 2 — Installation & Setup</h2>
+
+    <h3>Docker Desktop vs. Docker Engine</h3>
+    <p>Before installing, we must understand the difference between the two main versions of Docker:</p>
+    <ul>
+        <li><strong>Docker Engine:</strong> The raw, headless background process that runs containers. It only runs
+            natively on Linux servers.</li>
+        <li><strong>Docker Desktop:</strong> A graphical application built for Mac and Windows. Because containers
+            explicitly require a Linux kernel, Docker Desktop secretly spins up a lightweight Linux virtual machine on
+            our computer, installs Docker Engine inside it, and bridges it to our host OS so we can run Linux
+            containers on a Mac or Windows machine.</li>
+    </ul>
+
+    <div class="usage-box">
+        <strong>Rule of Thumb:</strong><br>
+        If we are on a Mac or Windows laptop, we install <strong>Docker Desktop</strong>.<br>
+        If we are deploying code to a production Ubuntu or Debian server, we install the raw <strong>Docker
+            Engine</strong>.
+    </div>
+
+    <h3>Installation Guides</h3>
+
+    <h4>1. Windows (WSL2 + Docker Desktop)</h4>
+    <p>Windows developers must use the Windows Subsystem for Linux (WSL2), which runs a true Linux kernel alongside
+        Windows. Docker Desktop integrates directly with WSL2.</p>
+    <ol>
+        <li>We open PowerShell as Administrator and run: <code>wsl --install</code>. Then restart our computer.</li>
+        <li>Download and install <strong>Docker Desktop for Windows</strong> from the official website.</li>
+        <li>During installation, ensure the checkbox for <strong>"Use WSL 2 instead of Hyper-V"</strong> is checked.
+        </li>
+        <li>Open Docker Desktop and wait for the engine to start (the whale icon bottom-left should turn green).</li>
+    </ol>
+
+    <div class="plain-english-box">
+        <strong>💡 WSL2 Integration Tip:</strong><br>
+        To get maximum file I/O performance on Windows, we keep our project code files <em>inside</em> the WSL2
+        filesystem
+        (e.g., <code>\\wsl$\Ubuntu\home\myproject</code>) rather than our standard Windows `C:\` drive. If Docker has
+        to constantly translate files back-and-forth across the Windows/Linux boundary, our container builds will be
+        incredibly slow.
+    </div>
+
+    <h4>2. macOS</h4>
+    <p>MacOS relies on a hidden hypervisor to run Linux containers. The installation is perfectly streamlined.</p>
+    <ol>
+        <li>Download <strong>Docker Desktop for Mac</strong> (making sure to pick the correct Apple Silicon vs. Intel
+            chip
+            version).</li>
+        <li>Drag the app to Applications and launch it.</li>
+        <li>Accept the permissions to install the background networking tools.</li>
+    </ol>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 3</span>
+    </div>
+</div>
+
+<!-- Chapter 2 Page 2 -->
+<div class="page">
+    <div class="header">CHAPTER 2 — Installation & Setup</div>
+
+    <h4>3. Linux (Ubuntu Server)</h4>
+    <p>On Linux, we do not install Docker Desktop. We want the bare-metal Docker Engine for maximum performance. We use
+        the
+        official repository:</p>
+    <pre><code># 1. Update our apt package index
+sudo apt-get update
+
+# 2. Install certificates and curl
+sudo apt-get install ca-certificates curl
+
+# 3. Add Docker's official GPG key
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+# 4. Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# 5. Install the Engine
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin</code></pre>
+
+    <h3>Verifying the Installation</h3>
+    <p>Once installed, we open a fresh terminal tab and run these two absolute checks:</p>
+    <pre><code>docker version</code></pre>
+    <p>This command splits output into two halves: "Client" and "Server". If we see both blocks printed out,
+        <strong>we are good to go.</strong> If it says "Cannot connect to the Docker daemon", it means our background
+        engine has not fully booted up.
+    </p>
+
+    <pre><code>docker info</code></pre>
+    <p>This dumps the total system state, confirming our exact architecture (e.g., `aarch64` for Apple Silicon) and how
+        many containers and images exist.</p>
+
+    <h3>Docker Hub Account & Login</h3>
+    <p>To pull specialized images or upload our own code later, we need a free Docker Hub account.</p>
+    <ol>
+        <li>Go to <code>hub.docker.com</code> and create a free account.</li>
+        <li>Open our terminal and type <code>docker login</code>.</li>
+        <li>Enter our username (not email) and password or Personal Access Token (PAT).</li>
+    </ol>
+    <p>Our local Docker daemon is now cryptographically linked to our cloud registry.</p>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 4</span>
+    </div>
+</div>

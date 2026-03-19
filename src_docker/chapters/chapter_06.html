@@ -1,0 +1,150 @@
+<div class="page" id="chapter-06">
+    <div class="header">CHAPTER 6 — Multi-Stage Builds</div>
+
+    <h2 style="margin-top: 0;">CHAPTER 6 — Multi-Stage Builds</h2>
+
+    <h3>The Problem: Fat Production Images</h3>
+    <p>Compiled languages (like Go, Rust, C++) and modern frontend frameworks (like React, Vue) require massive
+        toolchains to build our code. We need compilers, SDKs, enormous <code>node_modules</code>, and build caches.</p>
+    <p>If we use a standard single-stage Dockerfile, all of those gigabytes of build tools permanently ship inside our
+        final production image. This leads to:</p>
+    <ul>
+        <li><strong>Huge image sizes:</strong> Pulling a 1.5GB image to our production servers takes forever.</li>
+        <li><strong>Massive security risks:</strong> Shipping compilers and shell utilities into production gives
+            hackers exactly the tools they need to exploit our systems.</li>
+    </ul>
+
+    <h3>The Solution: The Builder Pattern</h3>
+    <p>Multi-stage builds allow us to split our Dockerfile into distinct "stages". We can use one heavy image to
+        completely compile our code, and then magically extract ONLY the final binary or built files into a second,
+        ultra-lightweight image.</p>
+
+    <div class="plain-english-box">
+        <strong>In plain English:</strong><br>
+        Imagine renting a massive industrial kitchen to bake a cake, but when it's done, we only carry the finished cake
+        into our dining room. We don't drag the ovens and mixers with us.
+    </div>
+
+    <h3>Syntax: Multiple FROM Statements</h3>
+    <p>A multi-stage Dockerfile simply has more than one <code>FROM</code> instruction. Each <code>FROM</code> begins a
+        new stage. We can name our stages using <code>AS &lt;name&gt;</code> and then copy files from one stage to
+        another using <code>COPY --from=&lt;name&gt;</code>.</p>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 14</span>
+    </div>
+</div>
+
+<!-- Chapter 6 Page 2 -->
+<div class="page">
+    <div class="header">CHAPTER 6 — Multi-Stage Builds</div>
+
+    <h3>Real Example 1: Go Binary Build</h3>
+    <p>Go is perfect for this. We compile our Go code into an incredibly raw binary executable, then run it in a
+        completely empty operating system.</p>
+
+    <pre><code># --- Stage 1: The Fat Builder ---
+# We use the full 1GB+ official golang image
+FROM golang:1.21 AS builder
+
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy the actual Go code
+COPY . .
+
+# Compile the binary, disabling C bindings for maximum portability
+RUN CGO_ENABLED=0 GOOS=linux go build -o my_api main.go
+
+
+# --- Stage 2: The Slim Runner ---
+# We use alpine, which is a tiny 5MB linux distribution
+FROM alpine:latest
+
+WORKDIR /root/
+
+# MAGIC TRICK: We copy the finished binary from the 'builder' stage.
+# The entire Go compiler from Stage 1 is instantly discarded forever.
+COPY --from=builder /app/my_api .
+
+# Give it execution rights
+RUN chmod +x ./my_api
+
+EXPOSE 8080
+CMD ["./my_api"]</code></pre>
+
+    <table class="reference-table">
+        <tr>
+            <th>Approach</th>
+            <th>Final Image Size</th>
+            <th>Security Attack Surface</th>
+        </tr>
+        <tr>
+            <td>Naive Single-Stage</td>
+            <td>~1.1 GB</td>
+            <td>Vast (Contains compilers, bash, package managers)</td>
+        </tr>
+        <tr>
+            <td>Multi-Stage</td>
+            <td>~15 MB</td>
+            <td>Almost none (Only contains Alpine and our single file)</td>
+        </tr>
+    </table>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 15</span>
+    </div>
+</div>
+
+<!-- Chapter 6 Page 3 -->
+<div class="page">
+    <div class="header">CHAPTER 6 — Multi-Stage Builds</div>
+
+    <h3>Real Example 2: React Build into Nginx</h3>
+    <p>We touched on this briefly in the last chapter, but let's formalize the React multi-stage pattern. A React app
+        needs Node.js and Webpack to transpile JSX into standard HTML/JS. But once built, we only need a static web
+        server to host those static files.</p>
+
+    <pre><code># --- Stage 1: Node.js Compilation ---
+FROM node:20-alpine AS frontend-builder
+WORKDIR /app
+
+# Strategically copy package files first for layer caching
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# Copy the entire React repository
+COPY . .
+
+# This runs webpack/vite and outputs a '/app/dist' folder 
+RUN npm run build
+
+
+# --- Stage 2: Nginx Web Server ---
+FROM nginx:alpine
+
+# Completely overwrite the default Nginx index.html with our React app
+COPY --from=frontend-builder /app/dist /usr/share/nginx/html/
+
+# We can also copy a custom nginx.conf if we are doing React routing
+# COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]</code></pre>
+
+    <div class="mistake-box">
+        <strong>⚠️ Warning: React Environment Variables</strong><br>
+        A massive gotcha for beginners: In a multi-stage React build, <code>ENV</code> variables must be passed during
+        the <strong>Builder Stage (Stage 1)</strong>, not Stage 2! The React compiler physically burns environment
+        variables (like API URLs) directly into the static JS files during the `npm run build` step. If we pass them
+        into the final Nginx container, React will never see them.
+    </div>
+
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 16</span>
+    </div>
+</div>

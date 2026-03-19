@@ -105,7 +105,9 @@ def generate_handbook(src_dir, dist_folder, book_title):
             content = f.read()
         title = extract_title(content)
         chapters_data.append({"filename": filename, "title": title, "content": content})
-        toc_links.append(f'<li><a href="{chapter_url(filename)}">{title}</a></li>')
+        toc_links.append(
+            f'<li><button class="toc-link" type="button" data-href="{chapter_url(filename)}">{title}</button></li>'
+        )
 
     toc_html = '<ul class="toc-list">\n' + "\n".join(toc_links) + "\n</ul>"
 
