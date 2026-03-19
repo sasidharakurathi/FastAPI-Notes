@@ -1,8 +1,8 @@
 (() => {
   const config = {
-    handbook: "fastapi",
-    bodyClass: "theme-fastapi",
-    contextLabel: "FastAPI Handbook",
+    handbook: "docker",
+    bodyClass: "theme-docker",
+    contextLabel: "Docker Handbook",
     copyLabel: "Copy",
     copiedLabel: "Copied",
   };

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Docker for Developers</title>
+    <title>Docker Complete Handbook</title>
     <style>:root {
   --primary: #2496ed;
   --primary-strong: #1676c6;
@@ -32,19 +32,136 @@ body {
   min-height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
   font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   font-size: 11pt;
   color: var(--text-main);
   background: transparent;
   margin: 0;
+  display: block;
+}
+
+a,
+button {
+  touch-action: manipulation;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  border-bottom: 1px solid var(--border-color);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  background: rgba(8, 16, 30, 0.86);
+}
+
+.topbar-inner {
+  max-width: 1400px;
+  margin: 0 auto;
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  gap: 12px;
+}
+
+.topbar-context {
+  margin-left: auto;
+  margin-right: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(36, 150, 237, 0.3);
+  background: rgba(36, 150, 237, 0.12);
+  color: #ddecff;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.brand {
+  text-decoration: none;
+  color: #e8f2ff;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.top-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  flex-wrap: nowrap;
+}
+
+.top-link {
+  text-decoration: none;
+  color: #ccdef7;
+  border: 1px solid rgba(36, 150, 237, 0.3);
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.top-link-btn {
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.hamburger-icon {
+  width: 16px;
+  height: 14px;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.hamburger-icon span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  transform-origin: center;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.top-link-btn.is-open .hamburger-icon span:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.top-link-btn.is-open .hamburger-icon span:nth-child(2) {
+  opacity: 0;
+}
+
+.top-link-btn.is-open .hamburger-icon span:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+.top-link:hover {
+  background: rgba(36, 150, 237, 0.14);
+  color: #f2f8ff;
+}
+
+.top-link.active {
+  background: rgba(36, 150, 237, 0.22);
+  color: #f4f9ff;
 }
 
 .layout {
   display: flex;
   width: 100%;
-  min-height: 100vh;
+  min-height: calc(100vh - 57px);
 }
 
 .sidebar {
@@ -55,8 +172,8 @@ body {
   padding: 22px 18px;
   flex-shrink: 0;
   position: sticky;
-  top: 0;
-  height: 100vh;
+  top: 57px;
+  height: calc(100vh - 57px);
 }
 
 .sidebar h3 {
@@ -75,23 +192,49 @@ body {
 }
 
 .toc-list li {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .toc-list a {
   text-decoration: none;
-  color: #c8d8f2;
-  font-size: 10.5pt;
+  color: #d4e3fa;
+  font-size: 0.98rem;
+  line-height: 1.45;
   display: block;
-  padding: 8px 10px;
-  border-radius: 8px;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  overflow-wrap: anywhere;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 8px;
+}
+
+.toc-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2ch;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(36, 150, 237, 0.18);
+  color: #bfe0ff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.toc-label {
+  min-width: 0;
 }
 
 .toc-list a:hover,
 .toc-list a.active {
-  background: rgba(36, 150, 237, 0.15);
+  background: rgba(36, 150, 237, 0.14);
   color: #e7f2ff;
+  border-color: rgba(36, 150, 237, 0.34);
 }
 
 .content-wrapper {
@@ -107,7 +250,7 @@ body {
 .page {
   background: linear-gradient(180deg, #132038, #101a2d);
   width: min(210mm, 100%);
-  min-height: 297mm;
+  min-height: 0;
   margin-bottom: 24px;
   box-shadow: 0 12px 38px rgba(0, 0, 0, 0.42);
   border: 1px solid var(--border-color);
@@ -129,7 +272,6 @@ h5,
 h6 {
   font-weight: 700;
   color: var(--primary);
-  margin-top: 1.4em;
 }
 
 p,
@@ -159,6 +301,13 @@ a:visited {
   align-items: center;
   text-align: center;
   height: 100%;
+}
+
+.cover-logo {
+  display: block;
+  align-self: center;
+  margin-top: 34px;
+  margin-bottom: 20px;
 }
 
 .cover-title {
@@ -205,6 +354,43 @@ pre code {
   padding: 0;
 }
 
+.code-wrapper {
+  position: relative;
+  margin: 16px 0;
+}
+
+.code-wrapper pre {
+  margin: 0;
+  padding-top: 40px;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border: 1px solid rgba(36, 150, 237, 0.55);
+  background: rgba(9, 20, 37, 0.95);
+  color: #dfeeff;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.copy-btn:hover {
+  transform: translateY(-1px);
+  background: rgba(14, 32, 58, 0.98);
+  border-color: rgba(36, 150, 237, 0.85);
+}
+
+.copy-btn.copied {
+  background: rgba(36, 150, 237, 0.26);
+  color: #f3f8ff;
+}
+
 .plain-english-box {
   background-color: rgba(36, 150, 237, 0.12);
   border: 1px solid rgba(36, 150, 237, 0.45);
@@ -234,11 +420,9 @@ pre code {
 }
 
 .header {
-  position: absolute;
-  top: 0.5in;
-  left: 1in;
-  right: 1in;
+  position: static;
   border-bottom: 1px solid var(--border-color);
+  margin-bottom: 10px;
   padding-bottom: 5px;
   font-size: 9pt;
   color: var(--text-muted);
@@ -246,11 +430,9 @@ pre code {
 }
 
 .footer {
-  position: absolute;
-  bottom: 0.5in;
-  left: 1in;
-  right: 1in;
+  position: static;
   border-top: 1px solid var(--border-color);
+  margin-top: 14px;
   padding-top: 5px;
   font-size: 9pt;
   color: var(--text-muted);
@@ -289,6 +471,28 @@ pre code {
   pointer-events: none;
 }
 
+.cover-page + .nav-buttons {
+  justify-content: center;
+  border-top: 0;
+  padding-top: 0;
+  margin-top: 22px;
+}
+
+.cover-page + .nav-buttons .nav-btn {
+  border-radius: 999px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #3ea8ff, #2b86d3);
+  color: #041a31;
+  letter-spacing: 0.02em;
+  box-shadow: 0 10px 24px rgba(21, 104, 173, 0.38);
+}
+
+.cover-page + .nav-buttons .nav-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.02);
+  box-shadow: 0 14px 30px rgba(21, 104, 173, 0.44);
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -314,45 +518,203 @@ th {
     display: block;
   }
 
+  .topbar {
+    display: none;
+  }
+
+  .layout {
+    min-height: 0;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
   .page {
     box-shadow: none;
     border: 0;
     border-radius: 0;
     width: 100%;
+    min-height: 297mm;
     margin: 0;
     page-break-after: always;
     background: #fff;
     color: #111;
   }
+
+  .header {
+    position: absolute;
+    top: 0.5in;
+    left: 1in;
+    right: 1in;
+    margin: 0;
+  }
+
+  .footer {
+    position: absolute;
+    bottom: 0.5in;
+    left: 1in;
+    right: 1in;
+    margin: 0;
+  }
 }
 
 @media screen and (max-width: 1000px) {
-  .sidebar {
+  .topbar {
+    position: sticky;
+    top: 0;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: rgba(8, 18, 33, 0.98);
+  }
+
+  .topbar-inner {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
+  .topbar-context {
     display: none;
+  }
+
+  .brand {
+    font-size: 0.88rem;
+    max-width: 42vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .top-link {
+    padding: 6px 9px;
+    font-size: 0.78rem;
+  }
+
+  .top-nav {
+    gap: 6px;
+    margin-left: auto;
+    width: auto;
+  }
+
+  .layout {
+    display: block;
+    min-height: 0;
+  }
+
+  body.toc-open {
+    overflow: hidden;
+  }
+
+  .sidebar {
+    display: block;
+    min-height: 0;
+    height: calc(100dvh - 68px);
+    position: fixed;
+    top: 68px;
+    left: 0;
+    width: min(88vw, 360px);
+    z-index: 60;
+    border-right: 1px solid var(--border-color);
+    border-bottom: 0;
+    padding: 14px 12px;
+    margin: 0;
+    border-radius: 0 12px 12px 0;
+    background: rgba(10, 22, 40, 0.95);
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: none;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.36);
+    transform: translateX(-105%);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
+    will-change: transform, opacity;
+  }
+
+  .sidebar h3 {
+    margin: 0 0 8px;
+    padding-bottom: 0;
+  }
+
+  .toc-list {
+    display: grid;
+    gap: 7px;
+    overflow: visible;
+    padding-bottom: 0;
+  }
+
+  .toc-list li {
+    margin: 0;
+  }
+
+  .toc-list a {
+    width: 100%;
+    white-space: normal;
+    border: 1px solid rgba(36, 150, 237, 0.28);
+    background: rgba(36, 150, 237, 0.09);
+    color: #dcedff;
+    font-size: 0.88rem;
+    line-height: 1.3;
+    padding: 9px 10px;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: 8px;
+  }
+
+  .toc-index {
+    min-width: 28px;
+    text-align: center;
+    padding: 2px 6px;
+    margin-top: 1px;
+  }
+
+  .toc-label {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+  }
+
+  body.toc-open .sidebar {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  body.toc-open .content-wrapper::before {
+    content: "";
+    position: fixed;
+    inset: 68px 0 0;
+    z-index: 50;
+    background: rgba(4, 10, 20, 0.58);
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
   }
 
   .content-wrapper {
     padding: 12px;
+    overflow-y: visible;
+    min-height: 0;
+    position: relative;
+  }
+
+  .top-link-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 34px;
+    min-width: 38px;
+    padding: 0;
   }
 
   .page {
     min-height: 0;
     margin-bottom: 14px;
-  }
-
-  .header,
-  .footer {
-    position: static;
-    left: auto;
-    right: auto;
-  }
-
-  .header {
-    margin-bottom: 10px;
-  }
-
-  .footer {
-    margin-top: 14px;
   }
 
   .nav-buttons {
@@ -363,6 +725,40 @@ th {
     display: block;
     overflow-x: auto;
     white-space: nowrap;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  .topbar-inner {
+    flex-wrap: nowrap;
+    padding: 8px 10px;
+  }
+
+  .top-nav {
+    width: auto;
+    gap: 5px;
+  }
+
+  .top-link {
+    flex: 0 0 auto;
+    text-align: center;
+    padding: 6px 8px;
+    font-size: 0.76rem;
+  }
+
+  .top-link-btn {
+    flex: 0 0 auto;
+    width: 36px;
+    min-width: 36px;
+  }
+
+  .nav-buttons {
+    flex-direction: column;
+  }
+
+  .nav-btn {
+    width: 100%;
+    text-align: center;
   }
 }
 
@@ -390,25 +786,51 @@ th {
 }
 </style>
 </head>
-<body>
+<body data-handbook="docker">
+    
+    <header class="topbar">
+        <div class="topbar-inner">
+            <a class="brand" href="/">Developer Handbooks</a>
+            <span class="topbar-context" id="topbar-context" aria-live="polite"></span>
+            <nav class="top-nav" aria-label="Primary navigation">
+                <a href="/fastapi/" class="top-link ">FastAPI</a>
+                <a href="/docker/" class="top-link active">Docker</a>
+                <button id="toc-toggle" class="top-link top-link-btn" type="button" aria-expanded="false" aria-controls="toc-sidebar" aria-label="Open table of contents">
+                    <span class="hamburger-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+                </button>
+            </nav>
+        </div>
+    </header>
     <div class="layout">
-        <nav class="sidebar">
+        <nav class="sidebar" id="toc-sidebar">
             <h3>Table of Contents</h3>
             <ul class="toc-list">
-<li><a href="chapter_01.html">CHAPTER 1 — Why Docker? (The Mental Model)</a></li>
+<li><a href="/docker/chapter_01.html">CHAPTER 1 — Why Docker? (The Mental Model)</a></li>
 </ul>
         </nav>
         <main class="content-wrapper">
             <div class="page cover-page">
-    <h1 class="cover-title">Docker for Developers</h1>
-    <div class="cover-subtitle">Complete Handbook Notes. Zero Fluff.</div>
-    <div class="cover-note">The definitive cheat-sheet-meets-deep-dive that a developer keeps open in a second tab.
+    <svg class="cover-logo" width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg"
+        aria-label="Docker logo">
+        <circle cx="45" cy="45" r="44" fill="#2496ED" />
+        <rect x="24" y="37" width="10" height="9" rx="1.5" fill="#fff" />
+        <rect x="36" y="37" width="10" height="9" rx="1.5" fill="#fff" />
+        <rect x="48" y="37" width="10" height="9" rx="1.5" fill="#fff" />
+        <rect x="36" y="26" width="10" height="9" rx="1.5" fill="#fff" />
+        <rect x="48" y="26" width="10" height="9" rx="1.5" fill="#fff" />
+        <path d="M22 51h39c3.2 0 5.8-.9 7.9-2.8.8 7.2-4.5 13.8-12.8 13.8H40.6C31.4 62 24.7 58 22 51Z" fill="#fff" />
+        <path d="M66.5 39.5c1.7-.7 3.1-1.8 3.8-3.4 1.4 1.7 2 3.9 1.6 6.3" stroke="#fff" stroke-width="2" stroke-linecap="round" />
+    </svg>
+    <h1 class="cover-title">Docker Complete Handbook</h1>
+    <div class="cover-subtitle">Every Concept. Every Feature. With Real Examples.</div>
+    <div class="cover-note">Based on official Docker docs - v4.65.0
     </div>
     <div class="cover-note">Author: <b>Sasidhar Akurathi</b></div>
-    <div class="cover-note">Made with help of Gemini 3 Flash</div>
+    <div class="cover-note">Made with help of Gemini AI</div>
 </div>
-            <div class="nav-buttons"><a href="chapter_01.html" class="nav-btn">Start Reading →</a></div>
+            <div class="nav-buttons"><a href="/docker/chapter_01.html" class="nav-btn">Start Reading →</a></div>
         </main>
     </div>
+    <script src="/docker/script.js" defer></script>
 </body>
 </html>
