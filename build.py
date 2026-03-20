@@ -159,6 +159,13 @@ def generate_handbook(src_dir, dist_folder, book_title):
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{book_title}</title>
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){{
+            c[a]=c[a]||function(){{(c[a].q=c[a].q||[]).push(arguments)}};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        }})(window, document, "clarity", "script", "vxhj0j0zwn");
+    </script>
     <style>{css}</style>
 </head>
 <body data-handbook="{dist_folder}">
@@ -221,7 +228,8 @@ def build_hub():
         }}
 """
 
-    hub_html = """<!DOCTYPE html>
+    hub_html = (
+        """<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -230,7 +238,16 @@ def build_hub():
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
     <title>Developer Handbooks Hub</title>
-    <style>""" + hub_css_vars + """
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "vxhj0j0zwn");
+    </script>
+    <style>"""
+        + hub_css_vars
+        + """
 
         * { box-sizing: border-box; }
 
@@ -447,6 +464,7 @@ def build_hub():
     </main>
 </body>
 </html>"""
+    )
     for output_path in (os.path.join("dist", "index.html"), "index.html"):
         with open(output_path, "w", encoding="utf-8") as f:
             f.write(hub_html)

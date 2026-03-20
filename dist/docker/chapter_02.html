@@ -1,993 +1,980 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Docker Complete Handbook</title>
-  <style>
-    :root {
-      --primary: #2496ed;
-      --primary-strong: #1676c6;
-      --bg-main: #070c16;
-      --bg-surface: #0e1727;
-      --bg-elevated: #132038;
-      --text-main: #e6eefb;
-      --text-muted: #93a6c7;
-      --code-bg: #111f34;
-      --border-color: #223654;
-      --danger-bg: #3a1f28;
-      --warn-bg: #3b2b14;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      min-height: 100%;
-      overflow-x: hidden;
-      background: radial-gradient(circle at 92% 6%, rgba(36, 150, 237, 0.15), transparent 36%), var(--bg-main);
-    }
-
-    body {
-      min-height: 100%;
-      overflow-y: auto;
-      overflow-x: hidden;
-      font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      font-size: 11pt;
-      color: var(--text-main);
-      background: transparent;
-      margin: 0;
-      display: block;
-    }
-
-    a,
-    button {
-      touch-action: manipulation;
-    }
-
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 40;
-      border-bottom: 1px solid var(--border-color);
-      -webkit-backdrop-filter: blur(8px);
-      backdrop-filter: blur(8px);
-      background: rgba(8, 16, 30, 0.86);
-    }
-
-    .topbar-inner {
-      max-width: 1400px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 18px;
-      gap: 12px;
-    }
-
-    .topbar-context {
-      margin-left: auto;
-      margin-right: 8px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(36, 150, 237, 0.3);
-      background: rgba(36, 150, 237, 0.12);
-      color: #ddecff;
-      font-size: 0.76rem;
-      font-weight: 600;
-      letter-spacing: 0.03em;
-      white-space: nowrap;
-      pointer-events: none;
-    }
-
-    .brand {
-      text-decoration: none;
-      color: #e8f2ff;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      white-space: nowrap;
-    }
-
-    .top-nav {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-left: auto;
-      flex-wrap: nowrap;
-    }
-
-    .top-link {
-      text-decoration: none;
-      color: #ccdef7;
-      border: 1px solid rgba(36, 150, 237, 0.3);
-      border-radius: 999px;
-      padding: 7px 12px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      transition: background-color 0.2s ease, color 0.2s ease;
-    }
-
-    .top-link:visited {
-      color: #ccdef7;
-    }
-
-    .top-link-btn {
-      appearance: none;
-      background: transparent;
-      cursor: pointer;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      gap: 0;
-      transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
-    }
-
-    .hamburger-icon {
-      width: 16px;
-      height: 14px;
-      display: inline-flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .hamburger-icon span {
-      display: block;
-      width: 100%;
-      height: 2px;
-      border-radius: 999px;
-      background: currentColor;
-      transform-origin: center;
-      transition: transform 0.2s ease, opacity 0.2s ease;
-    }
-
-    .top-link-btn.is-open .hamburger-icon span:nth-child(1) {
-      transform: translateY(6px) rotate(45deg);
-    }
-
-    .top-link-btn.is-open .hamburger-icon span:nth-child(2) {
-      opacity: 0;
-    }
-
-    .top-link-btn.is-open .hamburger-icon span:nth-child(3) {
-      transform: translateY(-6px) rotate(-45deg);
-    }
-
-    .top-link:hover {
-      background: rgba(36, 150, 237, 0.14);
-      color: #f2f8ff;
-    }
-
-    .top-link.active {
-      background: rgba(36, 150, 237, 0.22);
-      color: #f4f9ff;
-    }
-
-    .top-link.active:visited {
-      color: #f4f9ff;
-    }
-
-    .layout {
-      display: flex;
-      width: 100%;
-      min-height: calc(100vh - 57px);
-    }
-
-    .sidebar {
-      width: 320px;
-      background: linear-gradient(180deg, rgba(14, 23, 39, 0.98), rgba(8, 16, 30, 0.98));
-      border-right: 1px solid var(--border-color);
-      overflow-y: auto;
-      padding: 22px 18px;
-      flex-shrink: 0;
-      position: sticky;
-      top: 57px;
-      height: calc(100vh - 57px);
-    }
-
-    .sidebar h3 {
-      margin-top: 0;
-      margin-bottom: 16px;
-      color: var(--primary);
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 10px;
-      letter-spacing: 0.03em;
-    }
-
-    .toc-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .toc-list li {
-      margin-bottom: 8px;
-    }
-
-    .toc-list a,
-    .toc-link {
-      appearance: none;
-      border: 1px solid transparent;
-      background: transparent;
-      cursor: pointer;
-      text-align: left;
-      font: inherit;
-      text-decoration: none;
-      color: #d4e3fa;
-      font-size: 0.98rem;
-      line-height: 1.45;
-      display: block;
-      padding: 10px 12px;
-      border-radius: 10px;
-      transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-      overflow-wrap: anywhere;
-      display: grid;
-      grid-template-columns: auto 1fr;
-      align-items: start;
-      gap: 8px;
-    }
-
-    .toc-index {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 2ch;
-      padding: 2px 6px;
-      border-radius: 6px;
-      background: rgba(36, 150, 237, 0.18);
-      color: #bfe0ff;
-      font-size: 0.72rem;
-      font-weight: 700;
-      line-height: 1;
-    }
-
-    .toc-label {
-      min-width: 0;
-    }
-
-    .toc-list a:hover,
-    .toc-list a.active,
-    .toc-link:hover,
-    .toc-link.active {
-      background: rgba(36, 150, 237, 0.14);
-      color: #e7f2ff;
-      border-color: rgba(36, 150, 237, 0.34);
-    }
-
-    .content-wrapper {
-      flex-grow: 1;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 28px 20px 38px;
-      background: linear-gradient(180deg, rgba(7, 12, 22, 0.35), rgba(7, 12, 22, 0.88));
-    }
-
-    .page {
-      background: linear-gradient(180deg, #132038, #101a2d);
-      width: min(210mm, 100%);
-      min-height: 0;
-      margin-bottom: 24px;
-      box-shadow: 0 12px 38px rgba(0, 0, 0, 0.42);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: clamp(16px, 2.8vw, 1in);
-      position: relative;
-      page-break-after: always;
-    }
-
-    .page>h2:first-of-type {
-      margin-top: 0;
-    }
-
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
-      font-weight: 700;
-      color: var(--primary);
-    }
-
-    p,
-    li {
-      line-height: 1.65;
-      color: var(--text-main);
-    }
-
-    a {
-      color: #78bfff;
-      transition: color 0.2s ease;
-    }
-
-    a:hover,
-    a:focus-visible {
-      color: #a4d5ff;
-    }
-
-    a:visited {
-      color: #70b4f3;
-    }
-
-    .cover-page {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      height: 100%;
-    }
-
-    .cover-logo {
-      display: block;
-      align-self: center;
-      margin-top: 34px;
-      margin-bottom: 20px;
-    }
-
-    .cover-title {
-      font-size: clamp(34px, 4.2vw, 58px);
-      margin-bottom: 16px;
-      color: var(--primary);
-    }
-
-    .cover-subtitle {
-      font-size: clamp(16px, 2.2vw, 24px);
-      color: #b4c7e7;
-      margin-bottom: 34px;
-      font-weight: 500;
-    }
-
-    .cover-note {
-      color: var(--text-muted);
-    }
-
-    pre {
-      background-color: var(--code-bg);
-      border: 1px solid var(--border-color);
-      border-left: 4px solid var(--primary);
-      padding: 14px;
-      font-family: Consolas, "Courier New", monospace;
-      font-size: 10pt;
-      overflow-x: auto;
-      border-radius: 8px;
-      color: #d8e8ff;
-    }
-
-    code {
-      font-family: Consolas, "Courier New", monospace;
-      font-size: 10pt;
-      background-color: rgba(36, 150, 237, 0.14);
-      color: #cbe4ff;
-      padding: 2px 5px;
-      border-radius: 4px;
-    }
-
-    pre code {
-      color: inherit;
-      background-color: transparent;
-      padding: 0;
-    }
-
-    .code-wrapper {
-      position: relative;
-      margin: 16px 0;
-    }
-
-    .code-wrapper pre {
-      margin: 0;
-      padding-top: 40px;
-    }
-
-    .copy-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      border: 1px solid rgba(36, 150, 237, 0.55);
-      background: rgba(9, 20, 37, 0.95);
-      color: #dfeeff;
-      border-radius: 999px;
-      padding: 4px 10px;
-      font-size: 0.76rem;
-      font-weight: 700;
-      line-height: 1;
-      cursor: pointer;
-      transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
-    }
-
-    .copy-btn:hover {
-      transform: translateY(-1px);
-      background: rgba(14, 32, 58, 0.98);
-      border-color: rgba(36, 150, 237, 0.85);
-    }
-
-    .copy-btn.copied {
-      background: rgba(36, 150, 237, 0.26);
-      color: #f3f8ff;
-    }
-
-    .plain-english-box {
-      background-color: rgba(36, 150, 237, 0.12);
-      border: 1px solid rgba(36, 150, 237, 0.45);
-      padding: 15px;
-      border-radius: 8px;
-      margin: 20px 0;
-    }
-
-    .plain-english-box strong {
-      color: #8dc9ff;
-    }
-
-    .mistake-box {
-      background-color: var(--danger-bg);
-      border-left: 4px solid #ff5f7f;
-      padding: 15px;
-      margin: 20px 0;
-      border-radius: 6px;
-    }
-
-    .usage-box {
-      background-color: var(--warn-bg);
-      border-left: 4px solid #ffbf4d;
-      padding: 15px;
-      margin: 20px 0;
-      border-radius: 6px;
-    }
-
-    .header {
-      position: static;
-      border-bottom: 1px solid var(--border-color);
-      margin-bottom: 10px;
-      padding-bottom: 5px;
-      font-size: 9pt;
-      color: var(--text-muted);
-      text-align: right;
-    }
-
-    .footer {
-      position: static;
-      border-top: 1px solid var(--border-color);
-      margin-top: 14px;
-      padding-top: 5px;
-      font-size: 9pt;
-      color: var(--text-muted);
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .nav-buttons {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      margin-top: 36px;
-      padding-top: 18px;
-      border-top: 1px solid var(--border-color);
-      width: min(210mm, 100%);
-    }
-
-    .nav-btn {
-      background-color: var(--primary);
-      color: #031221;
-      padding: 10px 18px;
-      text-decoration: none;
-      border-radius: 8px;
-      font-weight: 700;
-      transition: transform 0.18s ease, filter 0.18s ease;
-    }
-
-    .nav-btn:visited {
-      color: #031221;
-    }
-
-    .nav-btn:hover {
-      filter: brightness(0.94);
-      transform: translateY(-1px);
-    }
-
-    .nav-btn:hover,
-    .nav-btn:focus-visible,
-    .nav-btn:active,
-    .nav-btn:hover:visited,
-    .nav-btn:focus-visible:visited,
-    .nav-btn:active:visited {
-      color: #031221;
-    }
-
-    .nav-btn.disabled {
-      background-color: #2b3e5d;
-      color: #9fb0ca;
-      pointer-events: none;
-    }
-
-    .nav-btn.disabled:visited {
-      color: #9fb0ca;
-    }
-
-    .cover-page+.nav-buttons {
-      justify-content: center;
-      border-top: 0;
-      padding-top: 0;
-      margin-top: 22px;
-    }
-
-    .cover-page+.nav-buttons .nav-btn {
-      border-radius: 999px;
-      padding: 12px 24px;
-      background: linear-gradient(135deg, #3ea8ff, #2b86d3);
-      color: #041a31;
-      letter-spacing: 0.02em;
-      box-shadow: 0 10px 24px rgba(21, 104, 173, 0.38);
-    }
-
-    .cover-page+.nav-buttons .nav-btn:visited {
-      color: #041a31;
-    }
-
-    .cover-page+.nav-buttons .nav-btn:hover {
-      transform: translateY(-2px);
-      filter: brightness(1.02);
-      box-shadow: 0 14px 30px rgba(21, 104, 173, 0.44);
-    }
-
-    .cover-page+.nav-buttons .nav-btn:hover,
-    .cover-page+.nav-buttons .nav-btn:focus-visible,
-    .cover-page+.nav-buttons .nav-btn:active,
-    .cover-page+.nav-buttons .nav-btn:hover:visited,
-    .cover-page+.nav-buttons .nav-btn:focus-visible:visited,
-    .cover-page+.nav-buttons .nav-btn:active:visited {
-      color: #041a31;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 25px 0;
-    }
-
-    th,
-    td {
-      border: 1px solid var(--border-color);
-      padding: 12px;
-      text-align: left;
-    }
-
-    th {
-      background-color: rgba(36, 150, 237, 0.1);
-      color: #b3ddff;
-    }
-
-    .link-status {
-      position: fixed;
-      left: 12px;
-      bottom: 10px;
-      z-index: 1200;
-      max-width: min(460px, calc(100vw - 24px));
-      padding: 6px 10px;
-      border-radius: 8px;
-      border: 1px solid rgba(36, 150, 237, 0.55);
-      background: rgba(10, 20, 36, 0.95);
-      color: #e9f3ff;
-      font-size: 9.5pt;
-      line-height: 1.2;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
-      opacity: 0;
-      transform: translateY(6px);
-      pointer-events: none;
-      transition: opacity 0.16s ease, transform 0.16s ease;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .link-status.is-visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    @media print {
-      body {
-        background: #fff;
-        color: #111;
-        display: block;
-      }
-
-      .topbar {
-        display: none;
-      }
-
-      .layout {
-        min-height: 0;
-      }
-
-      .sidebar {
-        display: none;
-      }
-
-      .page {
-        box-shadow: none;
-        border: 0;
-        border-radius: 0;
-        width: 100%;
-        min-height: 297mm;
-        margin: 0;
-        page-break-after: always;
-        background: #fff;
-        color: #111;
-      }
-
-      .header {
-        position: absolute;
-        top: 0.5in;
-        left: 1in;
-        right: 1in;
-        margin: 0;
-      }
-
-      .footer {
-        position: absolute;
-        bottom: 0.5in;
-        left: 1in;
-        right: 1in;
-        margin: 0;
-      }
-    }
-
-    @media screen and (max-width: 1000px) {
-      .topbar {
-        position: sticky;
-        top: 0;
-        -webkit-backdrop-filter: none;
-        backdrop-filter: none;
-        background: rgba(8, 18, 33, 0.98);
-      }
-
-      .topbar-inner {
-        display: flex;
-        align-items: center;
-        flex-wrap: nowrap;
-        gap: 8px;
-        padding: 10px 12px;
-      }
-
-      .topbar-context {
-        display: none;
-      }
-
-      .brand {
-        font-size: 0.88rem;
-        max-width: 42vw;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .top-link {
-        padding: 6px 9px;
-        font-size: 0.78rem;
-      }
-
-      .top-nav {
-        gap: 6px;
-        margin-left: auto;
-        width: auto;
-      }
-
-      .layout {
-        display: block;
-        min-height: 0;
-      }
-
-      body.toc-open {
-        overflow: hidden;
-      }
-
-      .sidebar {
-        display: block;
-        min-height: 0;
-        height: calc(100dvh - 68px);
-        position: fixed;
-        top: 68px;
-        left: 0;
-        width: min(88vw, 360px);
-        z-index: 60;
-        border-right: 1px solid var(--border-color);
-        border-bottom: 0;
-        padding: 14px 12px;
-        margin: 0;
-        border-radius: 0 12px 12px 0;
-        background: rgba(10, 22, 40, 0.95);
-        overflow-x: hidden;
-        overflow-y: auto;
-        max-height: none;
-        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.36);
-        transform: translateX(-105%);
-        opacity: 0;
-        pointer-events: none;
-        transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
-        will-change: transform, opacity;
-      }
-
-      .sidebar h3 {
-        margin: 0 0 8px;
-        padding-bottom: 0;
-      }
-
-      .toc-list {
-        display: grid;
-        gap: 7px;
-        overflow: visible;
-        padding-bottom: 0;
-      }
-
-      .toc-list li {
-        margin: 0;
-      }
-
-      .toc-list a,
-      .toc-link {
-        width: 100%;
-        white-space: normal;
-        border: 1px solid rgba(36, 150, 237, 0.28);
-        background: rgba(36, 150, 237, 0.09);
-        color: #dcedff;
-        font-size: 0.88rem;
-        line-height: 1.3;
-        padding: 9px 10px;
-        display: grid;
-        grid-template-columns: auto minmax(0, 1fr);
-        align-items: start;
-        gap: 8px;
-      }
-
-      .toc-index {
-        min-width: 28px;
-        text-align: center;
-        padding: 2px 6px;
-        margin-top: 1px;
-      }
-
-      .toc-label {
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
-        line-clamp: 2;
-        overflow: hidden;
-      }
-
-      body.toc-open .sidebar {
-        transform: translateX(0);
-        opacity: 1;
-        pointer-events: auto;
-      }
-
-      body.toc-open .content-wrapper::before {
-        content: "";
-        position: fixed;
-        inset: 68px 0 0;
-        z-index: 50;
-        background: rgba(4, 10, 20, 0.58);
-        -webkit-backdrop-filter: blur(2px);
-        backdrop-filter: blur(2px);
-      }
-
-      .content-wrapper {
-        padding: 12px;
-        overflow-y: visible;
-        min-height: 0;
-        position: relative;
-      }
-
-      .top-link-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 38px;
-        height: 34px;
-        min-width: 38px;
-        padding: 0;
-      }
-
-      .page {
-        min-height: 0;
-        margin-bottom: 14px;
-      }
-
-      .nav-buttons {
-        width: 100%;
-      }
-
-      table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-      }
-    }
-
-    @media screen and (max-width: 640px) {
-      .topbar-inner {
-        flex-wrap: nowrap;
-        padding: 8px 10px;
-      }
-
-      .top-nav {
-        width: auto;
-        gap: 5px;
-      }
-
-      .top-link {
-        flex: 0 0 auto;
-        text-align: center;
-        padding: 6px 8px;
-        font-size: 0.76rem;
-      }
-
-      .top-link-btn {
-        flex: 0 0 auto;
-        width: 36px;
-        min-width: 36px;
-      }
-
-      .nav-buttons {
-        flex-direction: column;
-      }
-
-      .nav-btn {
-        width: 100%;
-        text-align: center;
-      }
-    }
-
-    ::-webkit-scrollbar {
-      width: 10px;
-      height: 10px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: rgba(14, 23, 39, 0.6);
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: rgba(36, 150, 237, 0.42);
-      border-radius: 8px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(36, 150, 237, 0.75);
-    }
-
-    ::selection {
-      background: rgba(36, 150, 237, 0.45);
-      color: #f6fbff;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docker Complete Handbook</title>
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "vxhj0j0zwn");
+    </script>
+    <style>:root {
+  --primary: #2496ed;
+  --primary-strong: #1676c6;
+  --bg-main: #070c16;
+  --bg-surface: #0e1727;
+  --bg-elevated: #132038;
+  --text-main: #e6eefb;
+  --text-muted: #93a6c7;
+  --code-bg: #111f34;
+  --border-color: #223654;
+  --danger-bg: #3a1f28;
+  --warn-bg: #3b2b14;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  overflow-x: hidden;
+  background: radial-gradient(circle at 92% 6%, rgba(36, 150, 237, 0.15), transparent 36%), var(--bg-main);
+}
+
+body {
+  min-height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 11pt;
+  color: var(--text-main);
+  background: transparent;
+  margin: 0;
+  display: block;
+}
+
+a,
+button {
+  touch-action: manipulation;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  border-bottom: 1px solid var(--border-color);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  background: rgba(8, 16, 30, 0.86);
+}
+
+.topbar-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  gap: 12px;
+}
+
+.topbar-context {
+  margin-left: auto;
+  margin-right: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(36, 150, 237, 0.3);
+  background: rgba(36, 150, 237, 0.12);
+  color: #ddecff;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.brand {
+  text-decoration: none;
+  color: #e8f2ff;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.top-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  flex-wrap: nowrap;
+}
+
+.top-link {
+  text-decoration: none;
+  color: #ccdef7;
+  border: 1px solid rgba(36, 150, 237, 0.3);
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.top-link:visited {
+  color: #ccdef7;
+}
+
+.top-link-btn {
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.hamburger-icon {
+  width: 16px;
+  height: 14px;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.hamburger-icon span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  transform-origin: center;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.top-link-btn.is-open .hamburger-icon span:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.top-link-btn.is-open .hamburger-icon span:nth-child(2) {
+  opacity: 0;
+}
+
+.top-link-btn.is-open .hamburger-icon span:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+.top-link:hover {
+  background: rgba(36, 150, 237, 0.14);
+  color: #f2f8ff;
+}
+
+.top-link.active {
+  background: rgba(36, 150, 237, 0.22);
+  color: #f4f9ff;
+}
+
+.top-link.active:visited {
+  color: #f4f9ff;
+}
+
+.layout {
+  display: flex;
+  width: 100%;
+  min-height: calc(100vh - 57px);
+}
+
+.sidebar {
+  width: 320px;
+  background: linear-gradient(180deg, rgba(14, 23, 39, 0.98), rgba(8, 16, 30, 0.98));
+  border-right: 1px solid var(--border-color);
+  overflow-y: auto;
+  padding: 22px 18px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 57px;
+  height: calc(100vh - 57px);
+}
+
+.sidebar h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: var(--primary);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+  letter-spacing: 0.03em;
+}
+
+.toc-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.toc-list li {
+  margin-bottom: 8px;
+}
+
+.toc-list a,
+.toc-link {
+  appearance: none;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  text-decoration: none;
+  color: #d4e3fa;
+  font-size: 0.98rem;
+  line-height: 1.45;
+  display: block;
+  padding: 10px 12px;
+  border-radius: 10px;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  overflow-wrap: anywhere;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 8px;
+}
+
+.toc-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2ch;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(36, 150, 237, 0.18);
+  color: #bfe0ff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.toc-label {
+  min-width: 0;
+}
+
+.toc-list a:hover,
+.toc-list a.active,
+.toc-link:hover,
+.toc-link.active {
+  background: rgba(36, 150, 237, 0.14);
+  color: #e7f2ff;
+  border-color: rgba(36, 150, 237, 0.34);
+}
+
+.content-wrapper {
+  flex-grow: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 20px 38px;
+  background: linear-gradient(180deg, rgba(7, 12, 22, 0.35), rgba(7, 12, 22, 0.88));
+}
+
+.page {
+  background: linear-gradient(180deg, #132038, #101a2d);
+  width: min(210mm, 100%);
+  min-height: 0;
+  margin-bottom: 24px;
+  box-shadow: 0 12px 38px rgba(0, 0, 0, 0.42);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: clamp(16px, 2.8vw, 1in);
+  position: relative;
+  page-break-after: always;
+}
+
+.page > h2:first-of-type {
+  margin-top: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 700;
+  color: var(--primary);
+}
+
+p,
+li {
+  line-height: 1.65;
+  color: var(--text-main);
+}
+
+a {
+  color: #78bfff;
+  transition: color 0.2s ease;
+}
+
+a:hover,
+a:focus-visible {
+  color: #a4d5ff;
+}
+
+a:visited {
+  color: #70b4f3;
+}
+
+.cover-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 100%;
+}
+
+.cover-logo {
+  display: block;
+  align-self: center;
+  margin-top: 34px;
+  margin-bottom: 20px;
+}
+
+.cover-title {
+  font-size: clamp(34px, 4.2vw, 58px);
+  margin-bottom: 16px;
+  color: var(--primary);
+}
+
+.cover-subtitle {
+  font-size: clamp(16px, 2.2vw, 24px);
+  color: #b4c7e7;
+  margin-bottom: 34px;
+  font-weight: 500;
+}
+
+.cover-note {
+  color: var(--text-muted);
+}
+
+pre {
+  background-color: var(--code-bg);
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--primary);
+  padding: 14px;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 10pt;
+  overflow-x: auto;
+  border-radius: 8px;
+  color: #d8e8ff;
+}
+
+code {
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 10pt;
+  background-color: rgba(36, 150, 237, 0.14);
+  color: #cbe4ff;
+  padding: 2px 5px;
+  border-radius: 4px;
+}
+
+pre code {
+  color: inherit;
+  background-color: transparent;
+  padding: 0;
+}
+
+.code-wrapper {
+  position: relative;
+  margin: 16px 0;
+}
+
+.code-wrapper pre {
+  margin: 0;
+  padding-top: 40px;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border: 1px solid rgba(36, 150, 237, 0.55);
+  background: rgba(9, 20, 37, 0.95);
+  color: #dfeeff;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.copy-btn:hover {
+  transform: translateY(-1px);
+  background: rgba(14, 32, 58, 0.98);
+  border-color: rgba(36, 150, 237, 0.85);
+}
+
+.copy-btn.copied {
+  background: rgba(36, 150, 237, 0.26);
+  color: #f3f8ff;
+}
+
+.plain-english-box {
+  background-color: rgba(36, 150, 237, 0.12);
+  border: 1px solid rgba(36, 150, 237, 0.45);
+  padding: 15px;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.plain-english-box strong {
+  color: #8dc9ff;
+}
+
+.mistake-box {
+  background-color: var(--danger-bg);
+  border-left: 4px solid #ff5f7f;
+  padding: 15px;
+  margin: 20px 0;
+  border-radius: 6px;
+}
+
+.usage-box {
+  background-color: var(--warn-bg);
+  border-left: 4px solid #ffbf4d;
+  padding: 15px;
+  margin: 20px 0;
+  border-radius: 6px;
+}
+
+.header {
+  position: static;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  font-size: 9pt;
+  color: var(--text-muted);
+  text-align: right;
+}
+
+.footer {
+  position: static;
+  border-top: 1px solid var(--border-color);
+  margin-top: 14px;
+  padding-top: 5px;
+  font-size: 9pt;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+}
+
+.nav-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 36px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-color);
+  width: min(210mm, 100%);
+}
+
+.nav-btn {
+  background-color: var(--primary);
+  color: #031221;
+  padding: 10px 18px;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 700;
+  transition: transform 0.18s ease, filter 0.18s ease;
+}
+
+.nav-btn:visited {
+  color: #031221;
+}
+
+.nav-btn:hover {
+  filter: brightness(0.94);
+  transform: translateY(-1px);
+}
+
+.nav-btn:hover,
+.nav-btn:focus-visible,
+.nav-btn:active,
+.nav-btn:hover:visited,
+.nav-btn:focus-visible:visited,
+.nav-btn:active:visited {
+  color: #031221;
+}
+
+.nav-btn.disabled {
+  background-color: #2b3e5d;
+  color: #9fb0ca;
+  pointer-events: none;
+}
+
+.nav-btn.disabled:visited {
+  color: #9fb0ca;
+}
+
+.cover-page + .nav-buttons {
+  justify-content: center;
+  border-top: 0;
+  padding-top: 0;
+  margin-top: 22px;
+}
+
+.cover-page + .nav-buttons .nav-btn {
+  border-radius: 999px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #3ea8ff, #2b86d3);
+  color: #041a31;
+  letter-spacing: 0.02em;
+  box-shadow: 0 10px 24px rgba(21, 104, 173, 0.38);
+}
+
+.cover-page + .nav-buttons .nav-btn:visited {
+  color: #041a31;
+}
+
+.cover-page + .nav-buttons .nav-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.02);
+  box-shadow: 0 14px 30px rgba(21, 104, 173, 0.44);
+}
+
+.cover-page + .nav-buttons .nav-btn:hover,
+.cover-page + .nav-buttons .nav-btn:focus-visible,
+.cover-page + .nav-buttons .nav-btn:active,
+.cover-page + .nav-buttons .nav-btn:hover:visited,
+.cover-page + .nav-buttons .nav-btn:focus-visible:visited,
+.cover-page + .nav-buttons .nav-btn:active:visited {
+  color: #041a31;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 25px 0;
+}
+
+th,
+td {
+  border: 1px solid var(--border-color);
+  padding: 12px;
+  text-align: left;
+}
+
+th {
+  background-color: rgba(36, 150, 237, 0.1);
+  color: #b3ddff;
+}
+
+.link-status {
+  position: fixed;
+  left: 12px;
+  bottom: 10px;
+  z-index: 1200;
+  max-width: min(460px, calc(100vw - 24px));
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(36, 150, 237, 0.55);
+  background: rgba(10, 20, 36, 0.95);
+  color: #e9f3ff;
+  font-size: 9.5pt;
+  line-height: 1.2;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+  transition: opacity 0.16s ease, transform 0.16s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.link-status.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media print {
+  body {
+    background: #fff;
+    color: #111;
+    display: block;
+  }
+
+  .topbar {
+    display: none;
+  }
+
+  .layout {
+    min-height: 0;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .page {
+    box-shadow: none;
+    border: 0;
+    border-radius: 0;
+    width: 100%;
+    min-height: 297mm;
+    margin: 0;
+    page-break-after: always;
+    background: #fff;
+    color: #111;
+  }
+
+  .header {
+    position: absolute;
+    top: 0.5in;
+    left: 1in;
+    right: 1in;
+    margin: 0;
+  }
+
+  .footer {
+    position: absolute;
+    bottom: 0.5in;
+    left: 1in;
+    right: 1in;
+    margin: 0;
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  .topbar {
+    position: sticky;
+    top: 0;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: rgba(8, 18, 33, 0.98);
+  }
+
+  .topbar-inner {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
+  .topbar-context {
+    display: none;
+  }
+
+  .brand {
+    font-size: 0.88rem;
+    max-width: 42vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .top-link {
+    padding: 6px 9px;
+    font-size: 0.78rem;
+  }
+
+  .top-nav {
+    gap: 6px;
+    margin-left: auto;
+    width: auto;
+  }
+
+  .layout {
+    display: block;
+    min-height: 0;
+  }
+
+  body.toc-open {
+    overflow: hidden;
+  }
+
+  .sidebar {
+    display: block;
+    min-height: 0;
+    height: calc(100dvh - 68px);
+    position: fixed;
+    top: 68px;
+    left: 0;
+    width: min(88vw, 360px);
+    z-index: 60;
+    border-right: 1px solid var(--border-color);
+    border-bottom: 0;
+    padding: 14px 12px;
+    margin: 0;
+    border-radius: 0 12px 12px 0;
+    background: rgba(10, 22, 40, 0.95);
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: none;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.36);
+    transform: translateX(-105%);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
+    will-change: transform, opacity;
+  }
+
+  .sidebar h3 {
+    margin: 0 0 8px;
+    padding-bottom: 0;
+  }
+
+  .toc-list {
+    display: grid;
+    gap: 7px;
+    overflow: visible;
+    padding-bottom: 0;
+  }
+
+  .toc-list li {
+    margin: 0;
+  }
+
+  .toc-list a,
+  .toc-link {
+    width: 100%;
+    white-space: normal;
+    border: 1px solid rgba(36, 150, 237, 0.28);
+    background: rgba(36, 150, 237, 0.09);
+    color: #dcedff;
+    font-size: 0.88rem;
+    line-height: 1.3;
+    padding: 9px 10px;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: 8px;
+  }
+
+  .toc-index {
+    min-width: 28px;
+    text-align: center;
+    padding: 2px 6px;
+    margin-top: 1px;
+  }
+
+  .toc-label {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+  }
+
+  body.toc-open .sidebar {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  body.toc-open .content-wrapper::before {
+    content: "";
+    position: fixed;
+    inset: 68px 0 0;
+    z-index: 50;
+    background: rgba(4, 10, 20, 0.58);
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+  }
+
+  .content-wrapper {
+    padding: 12px;
+    overflow-y: visible;
+    min-height: 0;
+    position: relative;
+  }
+
+  .top-link-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 34px;
+    min-width: 38px;
+    padding: 0;
+  }
+
+  .page {
+    min-height: 0;
+    margin-bottom: 14px;
+  }
+
+  .nav-buttons {
+    width: 100%;
+  }
+
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  .topbar-inner {
+    flex-wrap: nowrap;
+    padding: 8px 10px;
+  }
+
+  .top-nav {
+    width: auto;
+    gap: 5px;
+  }
+
+  .top-link {
+    flex: 0 0 auto;
+    text-align: center;
+    padding: 6px 8px;
+    font-size: 0.76rem;
+  }
+
+  .top-link-btn {
+    flex: 0 0 auto;
+    width: 36px;
+    min-width: 36px;
+  }
+
+  .nav-buttons {
+    flex-direction: column;
+  }
+
+  .nav-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(14, 23, 39, 0.6);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(36, 150, 237, 0.42);
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(36, 150, 237, 0.75);
+}
+
+::selection {
+  background: rgba(36, 150, 237, 0.45);
+  color: #f6fbff;
+}
+</style>
 </head>
-
 <body data-handbook="docker">
+    
+    <header class="topbar">
+        <div class="topbar-inner">
+            <a class="brand" href="/">Developer Handbooks</a>
+            <span class="topbar-context" id="topbar-context" aria-live="polite"></span>
+            <nav class="top-nav" aria-label="Primary navigation">
+                <a href="/fastapi/" class="top-link ">FastAPI</a>
+                <a href="/docker/" class="top-link active">Docker</a>
+                <button id="toc-toggle" class="top-link top-link-btn" type="button" aria-expanded="false" aria-controls="toc-sidebar" aria-label="Open table of contents">
+                    <span class="hamburger-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+                </button>
+            </nav>
+        </div>
+    </header>
+    <div class="layout">
+        <nav class="sidebar" id="toc-sidebar">
+            <h3>Table of Contents</h3>
+            <ul class="toc-list">
+<li><button class="toc-link" type="button" data-href="/docker/chapter_01.html">CHAPTER 1 - Why Docker? (The Mental Model)</button></li>
+<li><button class="toc-link" type="button" data-href="/docker/chapter_02.html">CHAPTER 2 - Installation & Setup</button></li>
+<li><button class="toc-link" type="button" data-href="/docker/chapter_03.html">CHAPTER 3 - Our First Container (Hands-On)</button></li>
+<li><button class="toc-link" type="button" data-href="/docker/chapter_04.html">CHAPTER 4 - Docker Images Deep Dive</button></li>
+<li><button class="toc-link" type="button" data-href="/docker/chapter_05.html">CHAPTER 5 - Writing Dockerfiles (The Core Skill)</button></li>
+<li><button class="toc-link" type="button" data-href="/docker/chapter_06.html">CHAPTER 6 - Multi-Stage Builds</button></li>
+<li><button class="toc-link" type="button" data-href="/docker/chapter_07.html">CHAPTER 7 - Volumes & Persistent Data</button></li>
+<li><button class="toc-link" type="button" data-href="/docker/chapter_08.html">CHAPTER 8 - Docker Networking</button></li>
+<li><button class="toc-link" type="button" data-href="/docker/chapter_09.html">CHAPTER 9 - Docker Compose (Multi-Container Apps)</button></li>
+<li><button class="toc-link" type="button" data-href="/docker/chapter_10.html">CHAPTER 10 - Development Workflow with Docker</button></li>
+<li><button class="toc-link" type="button" data-href="/docker/chapter_11.html">CHAPTER 11 - Docker Registry & Image Publishing</button></li>
+<li><button class="toc-link" type="button" data-href="/docker/chapter_12.html">CHAPTER 12 - Docker in CI/CD</button></li>
+<li><button class="toc-link" type="button" data-href="/docker/chapter_13.html">CHAPTER 13 - Performance, Size & Security</button></li>
+<li><button class="toc-link" type="button" data-href="/docker/chapter_14.html">CHAPTER 14 - Useful Patterns & Real-World Recipes</button></li>
+<li><button class="toc-link" type="button" data-href="/docker/chapter_15.html">CHAPTER 15 - Quick Reference & Cheat Sheet</button></li>
+</ul>
+        </nav>
+        <main class="content-wrapper">
+            <div class="page" id="chapter-02">
+    <div class="header">CHAPTER 2 - Installation & Setup</div>
 
-  <header class="topbar">
-    <div class="topbar-inner">
-      <a class="brand" href="/">Developer Handbooks</a>
-      <span class="topbar-context" id="topbar-context" aria-live="polite"></span>
-      <nav class="top-nav" aria-label="Primary navigation">
-        <a href="/fastapi/" class="top-link ">FastAPI</a>
-        <a href="/docker/" class="top-link active">Docker</a>
-        <button id="toc-toggle" class="top-link top-link-btn" type="button" aria-expanded="false"
-          aria-controls="toc-sidebar" aria-label="Open table of contents">
-          <span class="hamburger-icon" aria-hidden="true"><span></span><span></span><span></span></span>
-        </button>
-      </nav>
-    </div>
-  </header>
-  <div class="layout">
-    <nav class="sidebar" id="toc-sidebar">
-      <h3>Table of Contents</h3>
-      <ul class="toc-list">
-        <li><button class="toc-link" type="button" data-href="/docker/chapter_01.html">CHAPTER 1 - Why Docker? (The
-            Mental Model)</button></li>
-        <li><button class="toc-link" type="button" data-href="/docker/chapter_02.html">CHAPTER 2 - Installation &
-            Setup</button></li>
-        <li><button class="toc-link" type="button" data-href="/docker/chapter_03.html">CHAPTER 3 - Our First Container
-            (Hands-On)</button></li>
-        <li><button class="toc-link" type="button" data-href="/docker/chapter_04.html">CHAPTER 4 - Docker Images Deep
-            Dive</button></li>
-        <li><button class="toc-link" type="button" data-href="/docker/chapter_05.html">CHAPTER 5 - Writing Dockerfiles
-            (The Core Skill)</button></li>
-        <li><button class="toc-link" type="button" data-href="/docker/chapter_06.html">CHAPTER 6 - Multi-Stage
-            Builds</button></li>
-        <li><button class="toc-link" type="button" data-href="/docker/chapter_07.html">CHAPTER 7 - Volumes & Persistent
-            Data</button></li>
-        <li><button class="toc-link" type="button" data-href="/docker/chapter_08.html">CHAPTER 8 - Docker
-            Networking</button></li>
-        <li><button class="toc-link" type="button" data-href="/docker/chapter_09.html">CHAPTER 9 - Docker Compose
-            (Multi-Container Apps)</button></li>
-        <li><button class="toc-link" type="button" data-href="/docker/chapter_10.html">CHAPTER 10 - Development Workflow
-            with Docker</button></li>
-        <li><button class="toc-link" type="button" data-href="/docker/chapter_11.html">CHAPTER 11 - Docker Registry &
-            Image Publishing</button></li>
-        <li><button class="toc-link" type="button" data-href="/docker/chapter_12.html">CHAPTER 12 - Docker in
-            CI/CD</button></li>
-        <li><button class="toc-link" type="button" data-href="/docker/chapter_13.html">CHAPTER 13 - Performance, Size &
-            Security</button></li>
-        <li><button class="toc-link" type="button" data-href="/docker/chapter_14.html">CHAPTER 14 - Useful Patterns &
-            Real-World Recipes</button></li>
-        <li><button class="toc-link" type="button" data-href="/docker/chapter_15.html">CHAPTER 15 - Quick Reference &
-            Cheat Sheet</button></li>
-      </ul>
-    </nav>
-    <main class="content-wrapper">
-      <div class="page" id="chapter-02">
-        <div class="header">CHAPTER 2 - Installation & Setup</div>
+    <h2 style="margin-top: 0;">CHAPTER 2 - Installation & Setup</h2>
 
-        <h2 style="margin-top: 0;">CHAPTER 2 - Installation & Setup</h2>
-
-        <h3>Docker Desktop vs. Docker Engine</h3>
-        <p>Before installing, we must understand the difference between the two main versions of Docker:</p>
-        <ul>
-          <li><strong>Docker Engine:</strong> The raw, headless background process that runs containers. It only runs
+    <h3>Docker Desktop vs. Docker Engine</h3>
+    <p>Before installing, we must understand the difference between the two main versions of Docker:</p>
+    <ul>
+        <li><strong>Docker Engine:</strong> The raw, headless background process that runs containers. It only runs
             natively on Linux servers.</li>
-          <li><strong>Docker Desktop:</strong> A graphical application built for Mac and Windows. Because containers
+        <li><strong>Docker Desktop:</strong> A graphical application built for Mac and Windows. Because containers
             explicitly require a Linux kernel, Docker Desktop secretly spins up a lightweight Linux virtual machine on
             our computer, installs Docker Engine inside it, and bridges it to our host OS so we can run Linux
             containers on a Mac or Windows machine.</li>
-        </ul>
+    </ul>
 
-        <div class="usage-box">
-          <strong>Rule of Thumb:</strong><br>
-          If we are on a Mac or Windows laptop, we install <strong>Docker Desktop</strong>.<br>
-          If we are deploying code to a production Ubuntu or Debian server, we install the raw <strong>Docker
+    <div class="usage-box">
+        <strong>Rule of Thumb:</strong><br>
+        If we are on a Mac or Windows laptop, we install <strong>Docker Desktop</strong>.<br>
+        If we are deploying code to a production Ubuntu or Debian server, we install the raw <strong>Docker
             Engine</strong>.
-        </div>
+    </div>
 
-        <h3>Installation Guides</h3>
+    <h3>Installation Guides</h3>
 
-        <h4>1. Windows (WSL2 + Docker Desktop)</h4>
-        <p>Windows developers must use the Windows Subsystem for Linux (WSL2), which runs a true Linux kernel alongside
-          Windows. Docker Desktop integrates directly with WSL2.</p>
-        <ol>
-          <li>We open PowerShell as Administrator and run: <code>wsl --install</code>. Then restart our computer.</li>
-          <li>Download and install <strong>Docker Desktop for Windows</strong> from the official website.</li>
-          <li>During installation, ensure the checkbox for <strong>"Use WSL 2 instead of Hyper-V"</strong> is checked.
-          </li>
-          <li>Open Docker Desktop and wait for the engine to start (the whale icon bottom-left should turn green).</li>
-        </ol>
+    <h4>1. Windows (WSL2 + Docker Desktop)</h4>
+    <p>Windows developers must use the Windows Subsystem for Linux (WSL2), which runs a true Linux kernel alongside
+        Windows. Docker Desktop integrates directly with WSL2.</p>
+    <ol>
+        <li>We open PowerShell as Administrator and run: <code>wsl --install</code>. Then restart our computer.</li>
+        <li>Download and install <strong>Docker Desktop for Windows</strong> from the official website.</li>
+        <li>During installation, ensure the checkbox for <strong>"Use WSL 2 instead of Hyper-V"</strong> is checked.
+        </li>
+        <li>Open Docker Desktop and wait for the engine to start (the whale icon bottom-left should turn green).</li>
+    </ol>
 
-        <div class="plain-english-box">
-          <strong>💡 WSL2 Integration Tip:</strong><br>
-          To get maximum file I/O performance on Windows, we keep our project code files <em>inside</em> the WSL2
-          filesystem
-          (e.g., <code>\\wsl$\Ubuntu\home\myproject</code>) rather than our standard Windows `C:\` drive. If Docker has
-          to constantly translate files back-and-forth across the Windows/Linux boundary, our container builds will be
-          incredibly slow.
-        </div>
+    <div class="plain-english-box">
+        <strong>💡 WSL2 Integration Tip:</strong><br>
+        To get maximum file I/O performance on Windows, we keep our project code files <em>inside</em> the WSL2
+        filesystem
+        (e.g., <code>\\wsl$\Ubuntu\home\myproject</code>) rather than our standard Windows `C:\` drive. If Docker has
+        to constantly translate files back-and-forth across the Windows/Linux boundary, our container builds will be
+        incredibly slow.
+    </div>
 
-        <h4>2. macOS</h4>
-        <p>MacOS relies on a hidden hypervisor to run Linux containers. The installation is perfectly streamlined.</p>
-        <ol>
-          <li>Download <strong>Docker Desktop for Mac</strong> (making sure to pick the correct Apple Silicon vs. Intel
+    <h4>2. macOS</h4>
+    <p>MacOS relies on a hidden hypervisor to run Linux containers. The installation is perfectly streamlined.</p>
+    <ol>
+        <li>Download <strong>Docker Desktop for Mac</strong> (making sure to pick the correct Apple Silicon vs. Intel
             chip
             version).</li>
-          <li>Drag the app to Applications and launch it.</li>
-          <li>Accept the permissions to install the background networking tools.</li>
-        </ol>
+        <li>Drag the app to Applications and launch it.</li>
+        <li>Accept the permissions to install the background networking tools.</li>
+    </ol>
 
-        <div class="footer">
-          <span>Docker Complete Handbook</span>
-          <span>Page 3</span>
-        </div>
-      </div>
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 3</span>
+    </div>
+</div>
 
-      <!-- Chapter 2 Page 2 -->
-      <div class="page">
-        <div class="header">CHAPTER 2 - Installation & Setup</div>
+<!-- Chapter 2 Page 2 -->
+<div class="page">
+    <div class="header">CHAPTER 2 - Installation & Setup</div>
 
-        <h4>3. Linux (Ubuntu Server)</h4>
-        <p>On Linux, we do not install Docker Desktop. We want the bare-metal Docker Engine for maximum performance. We
-          use
-          the
-          official repository:</p>
-        <pre><code># 1. Update our apt package index
+    <h4>3. Linux (Ubuntu Server)</h4>
+    <p>On Linux, we do not install Docker Desktop. We want the bare-metal Docker Engine for maximum performance. We use
+        the
+        official repository:</p>
+    <pre><code># 1. Update our apt package index
 sudo apt-get update
 
 # 2. Install certificates and curl
@@ -1008,38 +995,35 @@ echo \
 sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin</code></pre>
 
-        <h3>Verifying the Installation</h3>
-        <p>Once installed, we open a fresh terminal tab and run these two absolute checks:</p>
-        <pre><code>docker version</code></pre>
-        <p>This command splits output into two halves: "Client" and "Server". If we see both blocks printed out,
-          <strong>we are good to go.</strong> If it says "Cannot connect to the Docker daemon", it means our background
-          engine has not fully booted up.
-        </p>
+    <h3>Verifying the Installation</h3>
+    <p>Once installed, we open a fresh terminal tab and run these two absolute checks:</p>
+    <pre><code>docker version</code></pre>
+    <p>This command splits output into two halves: "Client" and "Server". If we see both blocks printed out,
+        <strong>we are good to go.</strong> If it says "Cannot connect to the Docker daemon", it means our background
+        engine has not fully booted up.
+    </p>
 
-        <pre><code>docker info</code></pre>
-        <p>This dumps the total system state, confirming our exact architecture (e.g., `aarch64` for Apple Silicon) and
-          how
-          many containers and images exist.</p>
+    <pre><code>docker info</code></pre>
+    <p>This dumps the total system state, confirming our exact architecture (e.g., `aarch64` for Apple Silicon) and how
+        many containers and images exist.</p>
 
-        <h3>Docker Hub Account & Login</h3>
-        <p>To pull specialized images or upload our own code later, we need a free Docker Hub account.</p>
-        <ol>
-          <li>Go to <code>hub.docker.com</code> and create a free account.</li>
-          <li>Open our terminal and type <code>docker login</code>.</li>
-          <li>Enter our username (not email) and password or Personal Access Token (PAT).</li>
-        </ol>
-        <p>Our local Docker daemon is now cryptographically linked to our cloud registry.</p>
+    <h3>Docker Hub Account & Login</h3>
+    <p>To pull specialized images or upload our own code later, we need a free Docker Hub account.</p>
+    <ol>
+        <li>Go to <code>hub.docker.com</code> and create a free account.</li>
+        <li>Open our terminal and type <code>docker login</code>.</li>
+        <li>Enter our username (not email) and password or Personal Access Token (PAT).</li>
+    </ol>
+    <p>Our local Docker daemon is now cryptographically linked to our cloud registry.</p>
 
-        <div class="footer">
-          <span>Docker Complete Handbook</span>
-          <span>Page 4</span>
-        </div>
-      </div>
-      <div class="nav-buttons"><a href="/docker/chapter_01.html" class="nav-btn">← Previous</a><a
-          href="/docker/chapter_03.html" class="nav-btn">Next →</a></div>
-    </main>
-  </div>
-  <script src="/docker/script.js" defer></script>
+    <div class="footer">
+        <span>Docker Complete Handbook</span>
+        <span>Page 4</span>
+    </div>
+</div>
+            <div class="nav-buttons"><a href="/docker/chapter_01.html" class="nav-btn">← Previous</a><a href="/docker/chapter_03.html" class="nav-btn">Next →</a></div>
+        </main>
+    </div>
+    <script src="/docker/script.js" defer></script>
 </body>
-
 </html>
