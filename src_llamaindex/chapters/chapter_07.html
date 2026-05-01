@@ -1,0 +1,265 @@
+<div class="page" id="chapter-07">
+    <div class="header">Chapter 7: Advanced Chunking Strategies</div>
+
+    <h2 style="margin-top: 0;">CHAPTER 7 - Advanced Chunking Strategies</h2>
+    <h4>Why do we need advanced chunking strategies?</h4>
+    <h4>Let's think in this way <code>Why Basic Chunking is not enough?</code></h4>
+    <p>So far we have used:</p>
+    <pre><code class="language-python">SentenceSplitter(chunk_size=150, chunk_overlap=30)</code></pre>
+    <p>This is fixed sixed chunking.</p>
+    <ul>
+        <li>which means it doesn't consider the content or structure of the document.</li>
+    </ul>
+
+    <p><strong>Core point to consider for chunking:</strong></p>
+    <pre><code class="language-text">Chunking is NOT just splitting text.
+It is defining the semantic boundaries of knowledge.</code></pre>
+
+    <h4>Problems with Basic Chunking (Fixed Chunk Size)</h4>
+    <p>Example:</p>
+    <pre><code class="language-text">"Sasidhar built an ATS system. It includes resume parsing and RAG."</code></pre>
+
+    <p>With bad split:</p>
+    <pre><code class="language-text">Chunk 1: "Sasidhar built an ATS system."
+Chunk 2: "It includes resume parsing and RAG."</code></pre>
+
+    <p>If we ask <code>What does ATS include?</code></p>
+    <ul>
+        <li>Either Chunk 2 retrieved (missing ATS context)</li>
+        <li>Or Chunk 1 retrieved (missing features)</li>
+    </ul>
+
+    <p>Hence, the system / LLM fails to answer correctly.</p>
+
+    <h4>Advanced Chunking Strategies</h4>
+    <p><strong>There are alot of chunking strategies beyond fixed size. We'll focus on 3 main ones:</strong></p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Strategy</th>
+                <th>Description</th>
+                <th>Use Case</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>Section-based</td>
+                <td>Split based on document sections</td>
+                <td>Resumes, reports</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Semantic chunking</td>
+                <td>Split based on semantic meaning</td>
+                <td>Web data, unstructured text</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Slide window</td>
+                <td>Overlapping chunks with a sliding window</td>
+                <td>Long documents</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <span>LlamaIndex Complete Handbook</span>
+        <span>Page 27</span>
+    </div>
+</div>
+
+<div class="page">
+    <div class="header">Chapter 7: Advanced Chunking Strategies</div>
+
+    <h4>1. Section-based Chunking</h4>
+    <p>It splits documents based on the <strong>Natural Language Boundaries</strong> rather than tokens.<br>
+        <br>Impemenation:
+    </p>
+    <pre><code class="language-python">from llama_index.core.node_parser import SentenceSplitter
+
+parser = SentenceSplitter(
+    chunk_size=200,
+    chunk_overlap=50
+)
+
+nodes = parser.get_nodes_from_documents(documents)</code></pre>
+
+    <ul>
+        <li>Most commonly we use this for <code>General Text</code>, <code>Resumes</code>, <code>Documentations</code> etc.
+        </li>
+    </ul>
+
+    <p>Limitations:</p>
+    <ul>
+        <li>Still not <code>meaning-aware</code></li>
+    </ul>
+
+    <h4>2. Semantic Chunking</h4>
+    <p>It splits documents based on semantic meaning rather than fixed size. It uses an LLM to determine where to split
+        the text based on the content and context.</p>
+
+    <p>How it works:</p>
+    <pre><code class="language-text">Sentence embeddings -> compare similarity -> split when meaning shifts</code></pre>
+
+    <p>Implementation:</p>
+    <pre><code class="language-python">from llama_index.core.node_parser import SemanticSplitterNodeParser
+
+semantic_parser = SemanticSplitterNodeParser(
+    embed_model=embed_model,
+    buffer_size=1,        # context window
+    breakpoint_percentile_threshold=95
+)
+
+nodes = semantic_parser.get_nodes_from_documents(documents)</code></pre>
+
+    <div class="footer">
+        <span>LlamaIndex Complete Handbook</span>
+        <span>Page 28</span>
+    </div>
+</div>
+
+<div class="page">
+    <div class="header">Chapter 7: Advanced Chunking Strategies</div>
+
+    <p>Key Params:<br>
+        <code>breakpoint_percentile_threshold</code>
+    </p>
+    <ul>
+        <li>Controls split sensitivity</li>
+    </ul>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Value</th>
+                <th>Behavior</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>90</td>
+                <td>more splits</td>
+            </tr>
+            <tr>
+                <td>95</td>
+                <td>balanced</td>
+            </tr>
+            <tr>
+                <td>99</td>
+                <td>fewer splits</td>
+            </tr>
+        </tbody>
+    </table>
+
+
+    <ul>
+        <li>Best for <code>Web data</code>, <code>Mixed-topic text</code>, <code>Long documents</code> etc.</li>
+    </ul>
+
+    <p><br>
+        Why this is powerful?</p>
+    <pre><code class="language-text">It preserves meaning -> improves retrieval dramatically</code></pre>
+
+    <h4>3. Sliding Window Chunking</h4>
+    <p>It creates overlapping chunks by sliding a fixed-size window across the text. This ensures that even if a
+        sentence is split, the context is preserved in both chunks.</p>
+
+    <p>Example:</p>
+    <pre><code class="language-text">Chunk 1: [A B C]
+Chunk 2: [B C D]
+Chunk 3: [C D E]</code></pre>
+    <ul>
+        <li>Overlapping meaning windows</li>
+    </ul>
+
+    <p>Implementation:</p>
+    <pre><code class="language-python">from llama_index.core.node_parser import SentenceWindowNodeParser
+
+window_parser = SentenceWindowNodeParser.from_defaults(
+    window_size=3,   # number of sentences per chunk
+)
+
+nodes = window_parser.get_nodes_from_documents(documents)</code></pre>
+
+    <div class="footer">
+        <span>LlamaIndex Complete Handbook</span>
+        <span>Page 29</span>
+    </div>
+</div>
+
+<div class="page">
+    <div class="header">Chapter 7: Advanced Chunking Strategies</div>
+
+    <ul>
+        <li>Useful for <code>Conversational data</code>, <code>Logs</code>, <code>Q&A systems</code> and
+            <code>Context-heavy reasoning</code> etc.</li>
+        <li>This node saves main sentence and saved surrounding sentences in metadata.</li>
+    </ul>
+
+    <h4>Golden Rule of Chunking:</h4>
+    <pre><code class="language-text">Different data -> different chunking strategy</code></pre>
+
+    <p><strong>This is how I used different chunking strategies in my projects:</strong></p>
+    <table>
+        <thead>
+            <tr>
+                <th>Use Case</th>
+                <th>Best Strategy</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>ATS / Resume</td>
+                <td>SentenceSplitter + overlap</td>
+            </tr>
+            <tr>
+                <td>AI Assistant memory</td>
+                <td>Sliding window</td>
+            </tr>
+            <tr>
+                <td>Knowledge base</td>
+                <td>Semantic chunking</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h4>Hybrid Approach (Advanced Pattern)</h4>
+    <p>We can combine: <br>
+        <code>Semantic chunking + overlap = Production Grade Chunking</code></p>
+
+    <p><strong>Here is a mini <a href="https://github.com/sasidharakurathi/LlamaIndex-Learning/tree/main/practice/Module%202/Topic%207/task.py" target="_blank">task</a> for you to understand advanced chunking strategies better:</strong></p>
+    <p><strong>Take a document (like your project description or something like that)</strong></p>
+    <ol>
+        <li><strong>Create 3 versions:</strong>
+            <ul>
+                <li><strong>SentenceSplitter</strong></li>
+                <li><strong>SemanticSplitter</strong></li>
+                <li><strong>SentenceWindowParser</strong></li>
+            </ul>
+        </li>
+        <li><strong>For each:</strong>
+            <ul>
+                <li><strong>print nodes</strong></li>
+                <li><strong>run SAME query:</strong> <br>
+                    <pre><code class="language-text">"What projects has Sasidhar built?"</code></pre>
+                </li>
+            </ul>
+        </li>
+        <li><strong>Compare:</strong>
+            <ul>
+                <li>which retrieves best chunks?</li>
+                <li>which gives best answer?</li>
+            </ul>
+        </li>
+    </ol>
+
+    <p><strong>Run the <a href="https://github.com/sasidharakurathi/LlamaIndex-Learning/tree/main/practice/Module%202/Topic%207/task.py" target="_blank">task.py</a> and analyze the output to see how different chunking strategies impact retrieval and final answer quality.</strong></p>
+
+    <div class="footer">
+        <span>LlamaIndex Complete Handbook</span>
+        <span>Page 30</span>
+    </div>
+</div>

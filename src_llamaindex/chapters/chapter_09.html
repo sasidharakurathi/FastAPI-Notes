@@ -1,0 +1,247 @@
+<div class="page" id="chapter-09">
+    <div class="header">Chapter 9: Response Synthesis</div>
+
+    <h2 style="margin-top: 0;">CHAPTER 9 - Response Synthesis (Refine, Compact, Tree Summarize)</h2>
+    <p><strong>So, we have learnt strategies to retrieve relevant nodes.</strong> <br>
+        <strong>But what happens after retrieval?</strong> <br>
+        <strong>How does the LLM turn multiple nodes into One Answer?</strong> <br>
+    </p>
+
+    <ul>
+        <li>Synthesis is the step that takes place after the retrieval of relevant nodes.</li>
+        <li>It decided how to combine the retrieved nodes to generate a final answer.</li>
+    </ul>
+
+    <pre><code class="language-text">Retrieval decides WHAT is fetched
+Synthesis decides HOW it is combined</code></pre>
+
+    <h4>Why is Synthesis important?</h4>
+    <ul>
+        <li>If we retrieve 5 nodes, how do we combine them into a coherent answer?</li>
+        <li>The quality of the final answer depends heavily on the synthesis method used.</li>
+        <li>If we use a simple <code>refine</code> method, we might get a verbose answer that includes all nodes without
+            proper summarization.</li>
+        <li>If we use a <code>compact</code> method, we might lose important details in the process of summarization.
+        </li>
+        <li>If we use a <code>tree summarize</code> method, we can maintain a balance between detail and coherence by
+            summarizing nodes in a hierarchical manner.</li>
+    </ul>
+
+    <h4>Synthesis Strategies:</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>Strategy</th>
+                <th>Description</th>
+                <th>Use Case</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Compact</strong> (Default, Fast)</td>
+                <td>Combines all nodes into a single prompt and generates a concise answer</td>
+                <td>When you want a brief summary that captures the main points</td>
+            </tr>
+            <tr>
+                <td><strong>Refine</strong> (Iterative Reasoning)</td>
+                <td>Iteratively refines the answer by adding information from each node one by one</td>
+                <td>When you want a detailed answer that includes all nodes</td>
+            </tr>
+            <tr>
+                <td><strong>Tree Summarize</strong> (Hierarchical synthesis)</td>
+                <td>Builds a hierarchical summary by first summarizing individual nodes and then combining those summaries</td>
+                <td>When you have a large number of nodes and want to maintain a balance between detail and coherence</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <span>LlamaIndex Complete Handbook</span>
+        <span>Page 36</span>
+    </div>
+</div>
+
+<div class="page">
+    <div class="header">Chapter 9: Response Synthesis</div>
+
+    <h4>1. Compact Mode (Default)</h4>
+    <ul>
+        <li>It takes all retrieved nodes and combines them into a single prompt for the LLM to generate a concise
+            answer.</li>
+    </ul>
+
+    <p>Flow:</p>
+    <pre><code class="language-text">Nodes -> merged context -> single LLM call -> answer</code></pre>
+
+    <p>Implementation:</p>
+    <pre><code class="language-python">query_engine = index.as_query_engine(
+    llm=llm,
+    response_mode="compact"
+)</code></pre>
+
+    <p>Pros and Cons:</p>
+    <ul>
+        <li>It is super fast and simple to implement.</li>
+        <li>But it can lead to context overload if there are too many nodes.</li>
+        <li>Also it may miss important details in the process of summarization.</li>
+    </ul>
+
+    <h4>2. Refine Mode (Iterative Reasoning)</h4>
+    <ul>
+        <li>It takes each retrieved node one by one and iteratively refines the answer by adding information from each
+            node.</li>
+    </ul>
+
+    <p>Flow:</p>
+    <pre><code class="language-text">Node 1 -> initial answer
+Node 2 -> refine answer
+Node 3 -> refine again
+...
+Final answer</code></pre>
+
+    <p>Implementation:</p>
+    <pre><code class="language-python">query_engine = index.as_query_engine(
+    llm=llm,
+    response_mode="refine"
+)</code></pre>
+
+    <p>Pros and Cons:</p>
+    <ul>
+        <li>High accuracy and Better reasoning since it considers each node separately.</li>
+        <li>It can handle long contexts better than compact mode.</li>
+        <li>However, it is slower due to multiple LLM calls and can be more expensive.</li>
+    </ul>
+
+    <div class="footer">
+        <span>LlamaIndex Complete Handbook</span>
+        <span>Page 37</span>
+    </div>
+</div>
+
+<div class="page">
+    <div class="header">Chapter 9: Response Synthesis</div>
+
+    <h4>3. Tree Summarize Mode (Hierarchical Synthesis)</h4>
+    <ul>
+        <li>It builds a hierarchical summary by first summarizing individual nodes and then combining those summaries.
+        </li>
+        <li>Basically, it groups nodes and summarizes them in a tree-like structure.</li>
+    </ul>
+
+    <p>Flow:</p>
+    <pre><code class="language-text">Nodes -> grouped -> summarized -> combined -> final answer</code></pre>
+
+    <p>Implementation:</p>
+    <pre><code class="language-python">query_engine = index.as_query_engine(
+    llm=llm,
+    response_mode="tree_summarize"
+)</code></pre>
+
+    <p>Pros and Cons:</p>
+    <ul>
+        <li>It can easily handle large datasets and maintains sturcture outputs.</li>
+        <li>It has good usecase for reports, dashboards, and complex reasoning tasks.</li>
+        <li>However, it is the slowest and most expensive due to multiple LLM calls and complex processing.</li>
+    </ul>
+
+    <p><strong>Note: <code>Never use tree summarize for simple queries with few nodes. It is overkill and will just increase latency and cost without improving answer quality.</code></strong>
+    </p>
+
+    <h4>Side by Side Comparison of Synthesis Strategies:</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>Mode</th>
+                <th>Speed</th>
+                <th>Accuracy</th>
+                <th>Use Case</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Compact</td>
+                <td>Fast</td>
+                <td>Medium</td>
+                <td>simple Q&A</td>
+            </tr>
+            <tr>
+                <td>Refine</td>
+                <td>Medium</td>
+                <td>High</td>
+                <td>reasoning</td>
+            </tr>
+            <tr>
+                <td>Tree</td>
+                <td>Slow</td>
+                <td>High</td>
+                <td>summarization</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <span>LlamaIndex Complete Handbook</span>
+        <span>Page 38</span>
+    </div>
+</div>
+
+<div class="page">
+    <div class="header">Chapter 9: Response Synthesis</div>
+
+    <p><strong>Note:</strong></p>
+    <ul>
+        <li>Most of the time we tune retrieval but forget about systhesis tuning. </li>
+        <li>It is equally important to choose the right synthesis strategy based on the use case and the number of
+            retrieved nodes.</li>
+        <li>Wrong synthesis strategy can also lead to poor answer quality even if <code>retrieval(context)</code> is
+            perfect.</li>
+    </ul>
+
+    <p><strong>When to use which synthesis strategy?</strong></p>
+    <pre><code class="language-text">Few nodes -> Compact
+Many nodes -> Refine
+Huge corpus -> Tree</code></pre>
+
+    <h4>Let's see how to implement these synthesis strategies in practice:</h4>
+    <p><strong>Check <a href="https://github.com/sasidharakurathi/LlamaIndex-Learning/tree/main/practice/Module%202/Topic%209/task.py" target="_blank">task.py</a> for complete code.</strong></p>
+    <p><strong>Let's analyze and try to understand the <a href="https://github.com/sasidharakurathi/LlamaIndex-Learning/tree/main/practice/Module%202/Topic%209/output.txt" target="_blank">output</a> of three Synthesis Strategies.</strong></p>
+    <ol>
+        <li>Check line 10 in <a href="https://github.com/sasidharakurathi/LlamaIndex-Learning/blob/main/practice/Module%202/Topic%209/output.txt#L10" target="_blank">output.txt</a>
+            <ul>
+                <li>This is the default <code>Compact</code> mode output. </li>
+                <li>We can see that the response is a single line answer.</li>
+                <li>And there is no detailed explanation of my projects. It just gives a brief summary.</li>
+            </ul>
+        </li>
+        <li>Now check line 21-26 in <a href="https://github.com/sasidharakurathi/LlamaIndex-Learning/blob/main/practice/Module%202/Topic%209/output.txt#L21" target="_blank">output.txt</a>
+            <ul>
+                <li>This is the <code>Refine</code> mode output. </li>
+                <li>We can see that the response is more detailed and includes information from each node. It
+                    iteratively builds the answer by adding details from each retrieved node in a new line.</li>
+            </ul>
+        </li>
+        <li>Finally, check line 37-42 in <a href="https://github.com/sasidharakurathi/LlamaIndex-Learning/blob/main/practice/Module%202/Topic%209/output.txt#L37" target="_blank">output.txt</a>
+            <ul>
+                <li>This is the <code>Tree Summarize</code> mode output. </li>
+                <li>We can see that the response is structured and maintains a hierarchy of information. </li>
+                <li>It first summarizes individual nodes and then combines those summaries into a final answer.</li>
+                <li>That's the reason the response only contains my <code>Project Titles</code> and no explanation.
+                </li>
+                <li>As we learnt before, the <code>tree summarize mode</code> focuses on maintaining structure and
+                    hierarchy rather than providing detailed explanations. </li>
+                <li>It is more suitable for generating structured summaries or reports rather than detailed answers.
+                </li>
+            </ul>
+        </li>
+    </ol>
+
+    <p><strong>Response synthesis = prompt engineering layer</strong></p>
+    <pre><code class="language-text">LLM prompt = context + instructions</code></pre>
+
+    <p>We'll learn how to customize this in further modules.</p>
+
+    <div class="footer">
+        <span>LlamaIndex Complete Handbook</span>
+        <span>Page 39</span>
+    </div>
+</div>

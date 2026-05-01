@@ -1,0 +1,285 @@
+<div class="page" id="chapter-08">
+    <div class="header">Chapter 8: Retrieval Strategies</div>
+
+    <h2 style="margin-top: 0;">CHAPTER 8 - Retrieval Strategies (Similarity, MMR, Hybrid Search)</h2>
+    <h4>Why Default Retrieval is not enough?</h4>
+    <p>So far we have used:</p>
+    <pre><code class="language-python">retriever = index.as_retriever()</code></pre>
+    <p>This defaults to <strong>Top-K Similarity Search</strong></p>
+    <ul>
+        <li>Basically <code>Top-K Similarity Search</code> retrieves the most similar nodes based on <strong>cosine similarity</strong> of embeddings.</li>
+        <li>Now what is <code>Cosine Similarity</code>?
+            <ul>
+                <li>It measures the angle between two vectors. The smaller the angle, the more similar they are.</li>
+            </ul>
+        </li>
+    </ul>
+
+    <p><strong>Do not get scared by these terms.</strong><br>
+        Just think like <code>Top-K Similarity Search</code> is like asking "Which nodes are closest to my query in the
+        embedding space?"</p>
+
+    <p><strong>Default similarity search = high relevance BUT low diversity</strong></p>
+    <ul>
+        <li>Now what is relevance and diversity?
+            <ul>
+                <li><strong>Relevance</strong>: how closely the retrieved nodes match the query</li>
+                <li><strong>Diversity</strong>: how different the retrieved nodes are from each other</li>
+            </ul>
+        </li>
+        <li>The <code>Top-K Similarity Search</code> often retrieves:
+            <ul>
+                <li>similar chunks</li>
+                <li>repeated information</li>
+                <li>misses broader context</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h4>Let us understand the limitations with an example:</h4>
+    <p><strong>Query:</strong></p>
+    <pre><code class="language-text">"What projects has Sasidhar built?"</code></pre>
+
+    <p><strong>Similarity search (Top-K) might return:</strong></p>
+    <pre><code class="language-text">Node 1: ATS project (description)
+Node 2: ATS project (features)
+Node 3: ATS project (solutions)</code></pre>
+
+    <div class="footer">
+        <span>LlamaIndex Complete Handbook</span>
+        <span>Page 31</span>
+    </div>
+</div>
+
+<div class="page">
+    <div class="header">Chapter 8: Retrieval Strategies</div>
+
+    <p><strong>All the nodes are about the same project (ATS).</strong><br>
+        <strong>But we want to retrieve <code>ATS Project</code> + <code>Any other projects</code> Context. (That's how
+            the actual production RAG system should work)</strong>
+    </p>
+
+    <p><code>To solve this problem, we need more advanced retrieval strategies that balance relevance and diversity.</code>
+    </p>
+
+    <h4>Retrieval Strategies:</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>Strategy</th>
+                <th>Description</th>
+                <th>Use Case</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Similarity Search (Top-K)</td>
+                <td>Retrieves top K most similar nodes based on <code>cosine similarity</code></td>
+                <td>General retrieval, when relevance is key</td>
+            </tr>
+            <tr>
+                <td>Maximal Marginal Relevance (MMR)</td>
+                <td>Balances relevance and diversity by re-ranking nodes based on both similarity to the query and dissimilarity to already selected nodes</td>
+                <td>When you want a mix of relevant and diverse information</td>
+            </tr>
+            <tr>
+                <td>Hybrid Search</td>
+                <td>Combines traditional keyword-based search (like <code>BM25</code>) with vector similarity search to leverage both lexical and semantic matching</td>
+                <td>When you have a mix of structured and unstructured data, or when you want to ensure important keywords are included</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h4>1. Similarity Search (Top-K)</h4>
+    <p>How it works?</p>
+    <pre><code class="language-text">Query embedding -> find closest vectors -> return top-k</code></pre>
+
+    <p>Implementation:</p>
+    <pre><code class="language-python">retriever = index.as_retriever(
+    similarity_top_k=3
+)</code></pre>
+
+    <p>When to use?</p>
+    <ul>
+        <li>When we want the most relevant nodes</li>
+        <li>When we have a good embedding model that captures semantics well</li>
+    </ul>
+
+    <div class="footer">
+        <span>LlamaIndex Complete Handbook</span>
+        <span>Page 32</span>
+    </div>
+</div>
+
+<div class="page">
+    <div class="header">Chapter 8: Retrieval Strategies</div>
+
+    <h4>2. Max Marginal Relevance (MMR)</h4>
+    <p>What it does?</p>
+    <ul>
+        <li>It re-ranks retrieved nodes to balance relevance and diversity.</li>
+    </ul>
+
+    <p>Re-Ranking Logic:</p>
+    <pre><code class="language-text">Score = relevance - redundancy</code></pre>
+
+    <p>Implementation:</p>
+    <pre><code class="language-python">retriever = index.as_retriever(
+    similarity_top_k=5,
+    vector_store_query_mode="mmr",
+    mmr_threshold=0.5
+)</code></pre>
+
+    <p>Here, <code>mmr_threshold</code> controls the balance between relevance and diversity.</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Value</th>
+                <th>Behavior</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>0.0</td>
+                <td>pure diversity</td>
+            </tr>
+            <tr>
+                <td>0.5</td>
+                <td>balanced</td>
+            </tr>
+            <tr>
+                <td>1.0</td>
+                <td>pure similarity</td>
+            </tr>
+        </tbody>
+    </table>
+
+
+    <p><strong>Why this matters?</strong><br>
+        Now instead of:</p>
+    <pre><code class="language-text">ATS description
+ATS features
+ATS solutions</code></pre>
+
+    <p>We might get:</p>
+    <pre><code class="language-text">ATS project
+Cybersecurity internship
+Another project</code></pre>
+
+    <div class="footer">
+        <span>LlamaIndex Complete Handbook</span>
+        <span>Page 33</span>
+    </div>
+</div>
+
+<div class="page">
+    <div class="header">Chapter 8: Retrieval Strategies</div>
+
+    <p><strong>You might think why are we getting <code>Cybersecurity internship</code> when the query is about
+            projects?</strong></p>
+    <ul>
+        <li>This is because in the <code>Cybersecurity internship</code> node, there is some mention of
+            <code>projects</code> and the MMR algorithm is trying to balance relevance and diversity. So it includes it.
+        </li>
+    </ul>
+
+    <p><strong>When to use MMR?</strong></p>
+    <ul>
+        <li>Multi-topic queries</li>
+        <li>portfolio search</li>
+    </ul>
+
+    <h4>3. Hybrid Search (Semantic + Keyword)</h4>
+    <p>Problem with Embeddings:</p>
+    <ul>
+        <li>They struggle with exact keyword matching</li>
+        <li>They struggle with rare keywords that are important for retrieval</li>
+        <li>And importantly they struggle with names</li>
+    </ul>
+
+    <p><strong>For Example:</strong></p>
+    <p>Query:</p>
+    <pre><code class="language-text">"ATS system"</code></pre>
+
+    <p>Embedding may miss:</p>
+    <pre><code class="language-text">"Application Tracking System"</code></pre>
+
+    <p>So, what's the solution??</p>
+    <pre><code class="language-text">Combine keyword search (BM25) with vector search (semantic)</code></pre>
+
+    <p>Implementation:</p>
+    <pre><code class="language-python">retriever = index.as_retriever(
+    similarity_top_k=3,
+    vector_store_query_mode="hybrid"
+)</code></pre>
+
+    <p>Pros and Cons of Hybrid Search:</p>
+    <ul>
+        <li>It handles both exacts terms and meaning, improving recall.</li>
+        <li>However, it can be slower and more complex to implement.</li>
+        <li>It requries a proper setup.</li>
+    </ul>
+
+    <div class="footer">
+        <span>LlamaIndex Complete Handbook</span>
+        <span>Page 34</span>
+    </div>
+</div>
+
+<div class="page">
+    <div class="header">Chapter 8: Retrieval Strategies</div>
+
+    <h4>Side by Side Comparison of Retrieval Strategies:</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>Strategy</th>
+                <th>Strength</th>
+                <th>Weakness</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Similarity</td>
+                <td>precise</td>
+                <td>redundant</td>
+            </tr>
+            <tr>
+                <td>MMR</td>
+                <td>diverse</td>
+                <td>slightly less precise</td>
+            </tr>
+            <tr>
+                <td>Hybrid</td>
+                <td>most robust</td>
+                <td>setup complexity</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h4>Troubleshooting Common Retrieval Issues</h4>
+    <ol>
+        <li>Why MMR giving irrelevant nodes?
+            <ul>
+                <li>Too much of diversity (low threshold) can lead to irrelevant nodes being included.</li>
+                <li>Fix: Increase <code>mmr_threshold=0.7</code> to prioritize relevance more. </li>
+            </ul>
+        </li>
+        <li>Right now <code>Hybrid Search</code> is not working, why?
+            <ul>
+                <li>Vector store doesn't support keyword search</li>
+                <li>Fix: <code>ChromaDB</code> integration. (We will learn in later modules)</li>
+            </ul>
+        </li>
+    </ol>
+
+    <h4>Let's see how to implement these retrieval strategies in practice:</h4>
+    <p><strong>Check <a href="https://github.com/sasidharakurathi/LlamaIndex-Learning/tree/main/practice/Module%202/Topic%208/task.py" target="_blank">task.py</a> for complete code.</strong></p>
+    <p><strong>We have used <a href="https://github.com/sasidharakurathi/LlamaIndex-Learning/blob/main/practice/Module%202/Topic%208/task.py#L50" target="_blank">Top-k similarity retriever</a> and <a href="https://github.com/sasidharakurathi/LlamaIndex-Learning/blob/main/practice/Module%202/Topic%208/task.py#L51" target="_blank">MMR retriever</a> retrieve the chunks.</strong></p>
+    <p><strong>You can check and compare the output in <a href="https://github.com/sasidharakurathi/LlamaIndex-Learning/tree/main/practice/Module%202/Topic%208/output.txt" target="_blank">output.txt</a> to see the difference in retrieved nodes and final answer quality between the two strategies.</strong></p>
+
+    <div class="footer">
+        <span>LlamaIndex Complete Handbook</span>
+        <span>Page 35</span>
+    </div>
+</div>

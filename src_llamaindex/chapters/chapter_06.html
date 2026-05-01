@@ -1,0 +1,187 @@
+<div class="page" id="chapter-06">
+    <div class="header">Chapter 6: Embeddings Deep Dive</div>
+
+    <h2 style="margin-top: 0;">CHAPTER 6 - Embeddings Deep Dive (Gemini, local, hybrid)</h2>
+    <p><strong>MODULE 2 - Building Production-Grade RAG</strong></p>
+
+    <h4>What are Embeddings?</h4>
+    <p>We have been using them already:</p>
+    <pre><code class="language-python">HuggingFaceEmbedding("BAAI/bge-small-en")</code></pre>
+
+    <p>But let's define it properly:</p>
+    <p><code>Embeddings are numerical representations of text that capture semantic meaning</code></p>
+
+    <p><strong>Core Insight:</strong><br>
+        <code>Our RAG system is only as good as our embeddings.</code>
+    </p>
+
+    <h4>How They Work?</h4>
+    <p><strong>Example:</strong></p>
+    <pre><code class="language-python">"ATS system" -> [0.12, -0.45, 0.88, ...]
+"resume parser" -> [0.10, -0.40, 0.85, ...]</code></pre>
+    <p>-> Similar meaning vectors are close in space</p>
+
+    <h4>Retrieval Mechanism:</h4>
+    <pre><code class="language-text">Query -> embedding -> compare with stored vectors -> pick closest</code></pre>
+
+    <p><strong>Distance Metrics:</strong></p>
+    <table>
+        <thead>
+            <tr>
+                <th>Metric</th>
+                <th>Description</th>
+                <th>Use Case</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Cosine Similarity</td>
+                <td>Measures angle between vectors</td>
+                <td>Most common for text</td>
+            </tr>
+            <tr>
+                <td>Euclidean Distance</td>
+                <td>Measures straight-line distance</td>
+                <td>When magnitude matters</td>
+            </tr>
+            <tr>
+                <td>Dot Product</td>
+                <td>Measures raw similarity</td>
+                <td>Fast but less interpretable</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <span>LlamaIndex Complete Handbook</span>
+        <span>Page 23</span>
+    </div>
+</div>
+
+<div class="page">
+    <div class="header">Chapter 6: Embeddings Deep Dive</div>
+
+    <h4>Why Embeddings are Critical for RAG?</h4>
+    <p><strong>If embeddings are weak:</strong></p>
+    <pre><code class="language-text">Query: "projects"
+Retrieved: "internships"</code></pre>
+    <p>Entire System fails, even if LLM is perfect</p>
+
+    <h4>Types of Embeddings</h4>
+    <p><strong>1. Open Source (Local)</strong><br>Example:</p>
+    <ul>
+        <li><code>BAAI/bge-small-en</code></li>
+        <li><code>all-MiniLM-L6-v</code></li>
+    </ul>
+    <p><strong>Pros:</strong></p>
+    <ul>
+        <li>Free to use</li>
+        <li>No latency (runs locally)</li>
+    </ul>
+    <p><strong>Cons:</strong></p>
+    <ul>
+        <li>Lower semantic accuracy compared to top-tier models</li>
+    </ul>
+
+    <p><strong>2. Google Gemini Embeddings (Cloud)</strong></p>
+    <p><strong>Pros:</strong></p>
+    <ul>
+        <li>Better semantic understanding</li>
+        <li>Works well with Gemini LLM</li>
+    </ul>
+    <p><strong>Cons:</strong></p>
+    <ul>
+        <li>API usage limits</li>
+        <li>Slight latency</li>
+    </ul>
+
+    <h4>Practical Implementation of Embeddings</h4>
+    <p><strong>1. Our current implementation:</strong></p>
+    <pre><code class="language-python">from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+
+embed_model = HuggingFaceEmbedding(
+    model_name="BAAI/bge-small-en",
+    device="cpu"
+)</code></pre>
+
+    <div class="footer">
+        <span>LlamaIndex Complete Handbook</span>
+        <span>Page 24</span>
+    </div>
+</div>
+
+<div class="page">
+    <div class="header">Chapter 6: Embeddings Deep Dive</div>
+
+    <p><strong>2. Improve Retrieval Quality</strong></p>
+    <pre><code class="language-python">embed_model = HuggingFaceEmbedding(
+    model_name="BAAI/bge-small-en",
+    query_instruction="Represent this query for retrieving relevant documents:",
+    text_instruction="Represent this document for retrieval:"
+)</code></pre>
+    <p><strong>Why this is important?</strong></p>
+    <ul>
+        <li>The BGE models are trained with instructions</li>
+        <li>Without instructions, the embeddings are weaker</li>
+    </ul>
+
+    <p><strong>3. Debugging Embeddings</strong></p>
+    <pre><code class="language-python">query = "What projects has Sasidhar built?"
+
+query_embedding = embed_model.get_query_embedding(query)
+
+print(len(query_embedding))  # vector size
+print(query_embedding[:5])   # preview</code></pre>
+
+    <p><strong>Important issue to consider:</strong></p>
+    <ul>
+        <li>Embeddings are not perfect semantics</li>
+    </ul>
+
+    <p><strong>For example:</strong></p>
+    <pre><code class="language-text">Query: "strongest skills"
+Doc: "backend development, AI systems"</code></pre>
+    <ul>
+        <li>These might not match strongly</li>
+    </ul>
+
+    <p><strong>Why???</strong></p>
+    <ul>
+        <li>There is no lexical overlap</li>
+        <li>The semantic matching depends on the embedding model</li>
+    </ul>
+
+    <p><strong>Solution:</strong></p>
+    <ul>
+        <li>Hybrid search (BM25 + vector)</li>
+        <li>Reranking with LLM (we'll learn in later modules)</li>
+        <li>Query reformulation/rewriting (we'll learn in later modules)</li>
+    </ul>
+
+    <div class="footer">
+        <span>LlamaIndex Complete Handbook</span>
+        <span>Page 25</span>
+    </div>
+</div>
+
+<div class="page">
+    <div class="header">Chapter 6: Embeddings Deep Dive</div>
+
+    <h4>Nutshell:</h4>
+    <pre><code class="language-text">Chunking defines WHAT is indexed
+Embeddings define HOW it is retrieved</code></pre>
+
+    <p><strong>Here is a mini <a href="https://github.com/sasidharakurathi/LlamaIndex-Learning/tree/main/practice/Module%202/Topic%206/task.py" target="_blank">task</a> for you to understand embeddings better:</strong></p>
+    <ol>
+        <li>Activate python virtual environment</li>
+        <li>Change Directory to <a href="https://github.com/sasidharakurathi/LlamaIndex-Learning/tree/main/practice/Module%202/Topic%206/" target="_blank">Topic 6</a></li>
+        <li>Run <code>python task.py</code></li>
+        <li>You well huge list of floating point numbers in the output. These are the embedding vectors for the queries.</li>
+        <li>Don't get scared by the numbers. Just understand that these vectors are what allow the retriever to find relevant nodes based on semantic similarity. The closer the vectors, the more relevant the nodes are to the query.</li>
+    </ol>
+
+    <div class="footer">
+        <span>LlamaIndex Complete Handbook</span>
+        <span>Page 26</span>
+    </div>
+</div>

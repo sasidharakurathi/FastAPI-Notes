@@ -83,33 +83,19 @@ def create_llamaindex_files():
         <div class="header">Table of Contents</div>
         <h2 style="margin-top: 0;">Table of Contents</h2>
         <ul class="toc-list" id="toc">
-                <li class="toc-section">PART I - GETTING STARTED</li>
-                <li><button type="button" class="toc-link" data-target="#chapter-1">CHAPTER 1 - What is LlamaIndex?</button> <span class="page-num">3</span></li>
-                <li><button type="button" class="toc-link" data-target="#chapter-2">CHAPTER 2 - High-Level Concepts</button> <span class="page-num">5</span></li>
-                <li><button type="button" class="toc-link" data-target="#chapter-3">CHAPTER 3 - Installation and Setup</button> <span class="page-num">7</span></li>
+                <li class="toc-section">MODULE 1 - LLAMAINDEX FUNDAMENTALS</li>
+                <li><button type="button" class="toc-link" data-target="#chapter-1">CHAPTER 1 - Architecture</button> <span class="page-num">1</span></li>
+                <li><button type="button" class="toc-link" data-target="#chapter-2">CHAPTER 2 - Documents vs Nodes vs Chunking</button> <span class="page-num">6</span></li>
+                <li><button type="button" class="toc-link" data-target="#chapter-3">CHAPTER 3 - Index Types Deep Dive</button> <span class="page-num">11</span></li>
+                <li><button type="button" class="toc-link" data-target="#chapter-4">CHAPTER 4 - StorageContext & Persistence</button> <span class="page-num">16</span></li>
+                <li><button type="button" class="toc-link" data-target="#chapter-5">CHAPTER 5 - Query Engine vs Retriever</button> <span class="page-num">19</span></li>
                 
-                <li class="toc-section">PART II - DATA CONNECTORS & INGESTION</li>
-                <li><button type="button" class="toc-link" data-target="#chapter-4">CHAPTER 4 - Loading Data (SimpleDirectoryReader)</button> <span class="page-num">10</span></li>
-                <li><button type="button" class="toc-link" data-target="#chapter-5">CHAPTER 5 - Nodes and Documents</button> <span class="page-num">13</span></li>
-                <li><button type="button" class="toc-link" data-target="#chapter-6">CHAPTER 6 - Data Transformations (Node Parsers)</button> <span class="page-num">16</span></li>
-                
-                <li class="toc-section">PART III - INDEXING</li>
-                <li><button type="button" class="toc-link" data-target="#chapter-7">CHAPTER 7 - Vector Store Index</button> <span class="page-num">19</span></li>
-                <li><button type="button" class="toc-link" data-target="#chapter-8">CHAPTER 8 - Summary Index & Keyword Table Index</button> <span class="page-num">22</span></li>
-                <li><button type="button" class="toc-link" data-target="#chapter-9">CHAPTER 9 - Storage Context & Vector Stores</button> <span class="page-num">25</span></li>
-                <li><button type="button" class="toc-link" data-target="#chapter-10">CHAPTER 10 - Persisting and Loading Indexes</button> <span class="page-num">28</span></li>
-                
-                <li class="toc-section">PART IV - QUERYING & RETRIEVAL</li>
-                <li><button type="button" class="toc-link" data-target="#chapter-11">CHAPTER 11 - Query Engines vs Chat Engines</button> <span class="page-num">31</span></li>
-                <li><button type="button" class="toc-link" data-target="#chapter-12">CHAPTER 12 - Retrievers</button> <span class="page-num">34</span></li>
-                <li><button type="button" class="toc-link" data-target="#chapter-13">CHAPTER 13 - Node Postprocessors & Reranking</button> <span class="page-num">37</span></li>
-                <li><button type="button" class="toc-link" data-target="#chapter-14">CHAPTER 14 - Response Synthesizers</button> <span class="page-num">40</span></li>
-                
-                <li class="toc-section">PART V - ADVANCED TOPICS</li>
-                <li><button type="button" class="toc-link" data-target="#chapter-15">CHAPTER 15 - Agents & Tools</button> <span class="page-num">43</span></li>
-                <li><button type="button" class="toc-link" data-target="#chapter-16">CHAPTER 16 - Callbacks & Observability</button> <span class="page-num">47</span></li>
-                <li><button type="button" class="toc-link" data-target="#chapter-17">CHAPTER 17 - Evaluation</button> <span class="page-num">51</span></li>
-                <li><button type="button" class="toc-link" data-target="#chapter-18">CHAPTER 18 - Deployment Patterns</button> <span class="page-num">55</span></li>
+                <li class="toc-section">MODULE 2 - BUILDING PRODUCTION-GRADE RAG</li>
+                <li><button type="button" class="toc-link" data-target="#chapter-6">CHAPTER 6 - Embeddings Deep Dive</button> <span class="page-num">23</span></li>
+                <li><button type="button" class="toc-link" data-target="#chapter-7">CHAPTER 7 - Advanced Chunking Strategies</button> <span class="page-num">27</span></li>
+                <li><button type="button" class="toc-link" data-target="#chapter-8">CHAPTER 8 - Retrieval Strategies</button> <span class="page-num">31</span></li>
+                <li><button type="button" class="toc-link" data-target="#chapter-9">CHAPTER 9 - Response Synthesis</button> <span class="page-num">36</span></li>
+                <li><button type="button" class="toc-link" data-target="#chapter-10">CHAPTER 10 - Evaluation & Debugging RAG</button> <span class="page-num">40</span></li>
         </ul>
         <div class="footer">
                 <span>LlamaIndex Complete Handbook</span>
